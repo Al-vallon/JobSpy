@@ -48,23 +48,36 @@ jobs:
           python -m build --wheel
           python -m pip install --only-binary :all: dist/*.whl
 
+      - name: Optional .jobspy.env from JOBSPY_DOTENV
+        if: ${{ vars.JOBSPY_DOTENV != '' }}
+        env:
+          JOBSPY_DOTENV: ${{ vars.JOBSPY_DOTENV }}
+        run: bash scripts/github_actions_load_dotenv.sh
+
       - name: Run jobspy
         env:
-          SEARCH_TERM: ${{ vars.JOBSPY_SEARCH_TERM }}
-          SITE: ${{ vars.JOBSPY_SITE }}
-          LOCATION: ${{ vars.JOBSPY_LOCATION }}
-          COUNTRY_INDEED: ${{ vars.JOBSPY_COUNTRY_INDEED }}
-          HOURS_OLD: ${{ vars.JOBSPY_HOURS_OLD }}
-          RESULTS: ${{ vars.JOBSPY_RESULTS }}
-          REMOTE_FLAG: ${{ vars.JOBSPY_REMOTE_FLAG }}
+          FALLBACK_SEARCH_TERM: ${{ vars.JOBSPY_SEARCH_TERM }}
+          FALLBACK_SITE: ${{ vars.JOBSPY_SITE }}
+          FALLBACK_LOCATION: ${{ vars.JOBSPY_LOCATION }}
+          FALLBACK_COUNTRY_INDEED: ${{ vars.JOBSPY_COUNTRY_INDEED }}
+          FALLBACK_HOURS_OLD: ${{ vars.JOBSPY_HOURS_OLD }}
+          FALLBACK_RESULTS: ${{ vars.JOBSPY_RESULTS }}
+          FALLBACK_REMOTE_FLAG: ${{ vars.JOBSPY_REMOTE_FLAG }}
         run: |
           set -euo pipefail
-          TERM="${SEARCH_TERM:-software engineer}"
-          SITES="${SITE:-indeed,linkedin,zip_recruiter,glassdoor}"
-          LOC="${LOCATION:-}"
-          COUNTRY="${COUNTRY_INDEED:-usa}"
-          HOURS="${HOURS_OLD:-72}"
-          N="${RESULTS:-50}"
+          if [ -f "$GITHUB_WORKSPACE/.jobspy.env" ]; then
+            set -a
+            # shellcheck disable=SC1091
+            . "$GITHUB_WORKSPACE/.jobspy.env"
+            set +a
+          fi
+          TERM="${SEARCH_TERM:-${FALLBACK_SEARCH_TERM:-software engineer}}"
+          SITES="${SITE:-${FALLBACK_SITE:-indeed,linkedin,zip_recruiter,glassdoor}}"
+          LOC="${LOCATION:-${FALLBACK_LOCATION:-}}"
+          COUNTRY="${COUNTRY_INDEED:-${FALLBACK_COUNTRY_INDEED:-usa}}"
+          HOURS="${HOURS_OLD:-${FALLBACK_HOURS_OLD:-72}}"
+          N="${RESULTS:-${FALLBACK_RESULTS:-50}}"
+          REMOTE_FLAG="${REMOTE_FLAG:-${FALLBACK_REMOTE_FLAG:-}}"
           mkdir -p data
           ARGS=( "$TERM" --site "$SITES" -n "$N" --hours-old "$HOURS" --country-indeed "$COUNTRY" )
           if [ -n "$LOC" ]; then ARGS+=( --location "$LOC" ); fi
@@ -83,15 +96,23 @@ jobs:
 
       - name: Build Discord payload
         env:
-          SKIP_DISCORD_IF_EMPTY: ${{ vars.JOBSPY_SKIP_DISCORD_IF_EMPTY }}
-          MAX_JOBS: ${{ vars.JOBSPY_DISCORD_MAX_JOBS }}
-          MAX_EMBED_CHARS: ${{ vars.JOBSPY_DISCORD_MAX_EMBED_CHARS }}
-          DISCORD_EMBED_TITLE: ${{ vars.JOBSPY_DISCORD_TITLE }}
+          FALLBACK_SKIP_DISCORD_IF_EMPTY: ${{ vars.JOBSPY_SKIP_DISCORD_IF_EMPTY }}
+          FALLBACK_MAX_JOBS: ${{ vars.JOBSPY_DISCORD_MAX_JOBS }}
+          FALLBACK_MAX_EMBED_CHARS: ${{ vars.JOBSPY_DISCORD_MAX_EMBED_CHARS }}
+          FALLBACK_DISCORD_EMBED_TITLE: ${{ vars.JOBSPY_DISCORD_TITLE }}
           DISCORD_SKIP_MARKER: ${{ env.JOBSPY_DISCORD_SKIP }}
         run: |
           rm -f "$JOBSPY_DISCORD_SKIP" "$JOBSPY_DISCORD_PAYLOAD"
-          export MAX_JOBS="${MAX_JOBS:-50}"
-          export MAX_EMBED_CHARS="${MAX_EMBED_CHARS:-4000}"
+          if [ -f "$GITHUB_WORKSPACE/.jobspy.env" ]; then
+            set -a
+            # shellcheck disable=SC1091
+            . "$GITHUB_WORKSPACE/.jobspy.env"
+            set +a
+          fi
+          export SKIP_DISCORD_IF_EMPTY="${SKIP_DISCORD_IF_EMPTY:-${FALLBACK_SKIP_DISCORD_IF_EMPTY:-}}"
+          export MAX_JOBS="${MAX_JOBS:-${FALLBACK_MAX_JOBS:-50}}"
+          export MAX_EMBED_CHARS="${MAX_EMBED_CHARS:-${FALLBACK_MAX_EMBED_CHARS:-4000}}"
+          export DISCORD_EMBED_TITLE="${DISCORD_EMBED_TITLE:-${FALLBACK_DISCORD_EMBED_TITLE:-}}"
           python scripts/github_discord_job_alert.py --payload-out "$JOBSPY_DISCORD_PAYLOAD" "$JOBSPY_NEW_JSONL"
 
       - name: Post to Discord (curl)

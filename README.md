@@ -79,7 +79,7 @@ jobspy "data analyst" --remote --fields title,company,job_url
 This repository includes a scheduled workflow (10:00 UTC daily) that runs the `jobspy` CLI, stores seen jobs in SQLite (cached between runs), and posts **new** listings to a Discord webhook. Defaults: **50** results per board (`JOBSPY_RESULTS`) and up to **50** jobs in the Discord summary (`JOBSPY_DISCORD_MAX_JOBS`).
 
 - Workflow: [`.github/workflows/daily-job-search.yml`](.github/workflows/daily-job-search.yml)
-- Setup (secret, variables, behaviour): [`docs/github-actions-daily.md`](docs/github-actions-daily.md)
+- Setup (secret, variables, optional single multiline `JOBSPY_DOTENV`, behaviour): [`docs/github-actions-daily.md`](docs/github-actions-daily.md)
 
 ## MCP server
 

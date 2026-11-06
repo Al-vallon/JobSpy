@@ -19,6 +19,33 @@ If the cache is missing or expired, the database starts empty and the first run 
 |------|-------------|
 | `DISCORD_WEBHOOK_URL` | [Incoming webhook](https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks) URL for the target channel — must start with `https://discord.com/api/webhooks/` |
 
+## One paste: multiline `JOBSPY_DOTENV` (optional)
+
+Instead of many separate repository variables, create **one** variable:
+
+- **Name:** `JOBSPY_DOTENV`
+- **Value:** several lines `KEY=value` (same keys as in bash below). Lines starting with `#` are ignored.
+
+Keys read by the workflow (after you push the version of the workflow that supports this):
+
+```
+SEARCH_TERM=développeur web
+SITE=indeed,linkedin,zip_recruiter,glassdoor
+LOCATION=Nantes
+COUNTRY_INDEED=france
+HOURS_OLD=72
+RESULTS=50
+REMOTE_FLAG=
+SKIP_DISCORD_IF_EMPTY=1
+MAX_JOBS=50
+MAX_EMBED_CHARS=4000
+DISCORD_EMBED_TITLE=Offres web — Nantes
+```
+
+Leave a key empty (e.g. `REMOTE_FLAG=`) to mean “not set”. If `JOBSPY_DOTENV` is **non-empty**, it **overrides** the individual `JOBSPY_*` variables for search + Discord payload (individual vars act as fallback when a key is missing from the block).
+
+`DISCORD_WEBHOOK_URL` stays a **secret**, not part of this block.
+
 ## Optional repository variables (`Settings → Secrets and variables → Actions → Variables`)
 
 | Variable | Default (if unset) | Description |
