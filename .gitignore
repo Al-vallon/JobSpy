@@ -12,3 +12,5 @@ dist
 # Local/cache data for GitHub Actions helper scripts
 data/*.sqlite
 data/*.jsonl
+data/discord_payload.json
+data/discord_skipped

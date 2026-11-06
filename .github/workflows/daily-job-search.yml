@@ -16,6 +16,8 @@ env:
   JOBSPY_SQLITE_PATH: data/jobspy_seen.sqlite
   JOBSPY_ALL_JSONL: data/last_scrape.jsonl
   JOBSPY_NEW_JSONL: data/new_jobs.jsonl
+  JOBSPY_DISCORD_PAYLOAD: data/discord_payload.json
+  JOBSPY_DISCORD_SKIP: data/discord_skipped
   JOBSPY_CACHE_KEY_PREFIX: jobspy-sqlite-${{ github.repository }}
 
 jobs:
@@ -79,15 +81,51 @@ jobs:
         run: |
           python scripts/github_jobspy_sqlite.py "$JOBSPY_ALL_JSONL" "$JOBSPY_NEW_JSONL" --db "$JOBSPY_SQLITE_PATH"
 
-      - name: Post to Discord
+      - name: Build Discord payload
         env:
-          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
-          DISCORD_USE_CURL: "1"
           SKIP_DISCORD_IF_EMPTY: ${{ vars.JOBSPY_SKIP_DISCORD_IF_EMPTY }}
           MAX_JOBS: ${{ vars.JOBSPY_DISCORD_MAX_JOBS }}
           DISCORD_EMBED_TITLE: ${{ vars.JOBSPY_DISCORD_TITLE }}
+          DISCORD_SKIP_MARKER: ${{ env.JOBSPY_DISCORD_SKIP }}
         run: |
-          python scripts/github_discord_job_alert.py "$JOBSPY_NEW_JSONL"
+          rm -f "$JOBSPY_DISCORD_SKIP" "$JOBSPY_DISCORD_PAYLOAD"
+          python scripts/github_discord_job_alert.py --payload-out "$JOBSPY_DISCORD_PAYLOAD" "$JOBSPY_NEW_JSONL"
+
+      - name: Post to Discord (curl)
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        run: |
+          set -euo pipefail
+          URL="$(printf '%s' "$DISCORD_WEBHOOK_URL" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//' | tr -d '\r')"
+          URL="${URL#\"}"
+          URL="${URL%\"}"
+          URL="${URL#\'}"
+          URL="${URL%\'}"
+          if ! printf '%s' "$URL" | grep -qE '^https://(discord\.com|discordapp\.com)/api/webhooks/'; then
+            echo "::error::DISCORD_WEBHOOK_URL must be the full webhook URL (https://discord.com/api/webhooks/...)"
+            exit 1
+          fi
+          if [ -f "$JOBSPY_DISCORD_SKIP" ]; then
+            echo "Discord skipped (JOBSPY_SKIP_DISCORD_IF_EMPTY and no new jobs)."
+            rm -f "$JOBSPY_DISCORD_SKIP"
+            exit 0
+          fi
+          if [ ! -f "$JOBSPY_DISCORD_PAYLOAD" ]; then
+            echo "::error::Missing $JOBSPY_DISCORD_PAYLOAD — build step failed?"
+            exit 1
+          fi
+          echo "Posting Discord payload via curl (no secret in log)…"
+          HTTP_CODE="$(curl -sS -o /tmp/discord_resp.txt -w '%{http_code}' -X POST "$URL" \
+            -H 'Content-Type: application/json' \
+            -H 'User-Agent: JobSpy-GitHub-Action/1.0' \
+            --data-binary @"$JOBSPY_DISCORD_PAYLOAD")"
+          echo "Discord HTTP status: $HTTP_CODE"
+          if [ "$HTTP_CODE" != "204" ] && [ "$HTTP_CODE" != "200" ]; then
+            echo "::error::Discord rejected the request. Body:"
+            head -c 2000 /tmp/discord_resp.txt || true
+            exit 1
+          fi
+          echo "Discord OK."
 
       - name: Save SQLite cache
         if: always()

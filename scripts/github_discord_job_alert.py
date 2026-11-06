@@ -117,24 +117,45 @@ def post_webhook(url: str, payload: dict[str, object]) -> None:
 
 
 def main() -> int:
+    argv = list(sys.argv[1:])
+    payload_out: Path | None = None
+    if argv and argv[0] == "--payload-out":
+        if len(argv) < 2:
+            print("usage: github_discord_job_alert.py --payload-out FILE <nouvelles.jsonl>", file=sys.stderr)
+            return 2
+        payload_out = Path(argv[1])
+        argv = argv[2:]
+    elif "--payload-out" in argv:
+        i = argv.index("--payload-out")
+        if i + 1 >= len(argv):
+            print("usage: … --payload-out FILE … <nouvelles.jsonl>", file=sys.stderr)
+            return 2
+        payload_out = Path(argv[i + 1])
+        argv = argv[:i] + argv[i + 2 :]
+
     webhook = os.environ.get("DISCORD_WEBHOOK_URL", "").strip()
     webhook = webhook.strip('"').strip("'").split()[0] if webhook else ""
-    if not webhook:
-        print("DISCORD_WEBHOOK_URL manquant", file=sys.stderr)
-        return 1
-    if not _webhook_url_ok(webhook):
+
+    if not payload_out:
+        if not webhook:
+            print("DISCORD_WEBHOOK_URL manquant", file=sys.stderr)
+            return 1
+        if not _webhook_url_ok(webhook):
+            print(
+                "DISCORD_WEBHOOK_URL doit être l’URL complète du webhook (https://discord.com/api/webhooks/…), "
+                "pas un token seul ni une autre API.",
+                file=sys.stderr,
+            )
+            return 1
+
+    if not argv:
         print(
-            "DISCORD_WEBHOOK_URL doit être l’URL complète du webhook (https://discord.com/api/webhooks/…), "
-            "pas un token seul ni une autre API.",
+            "usage: github_discord_job_alert.py [--payload-out FILE] <nouvelles.jsonl>",
             file=sys.stderr,
         )
-        return 1
-
-    if len(sys.argv) < 2:
-        print("usage: github_discord_job_alert.py <nouvelles.jsonl>", file=sys.stderr)
         return 2
 
-    path = Path(sys.argv[1])
+    path = Path(argv[0])
     skip_if_empty = os.environ.get("SKIP_DISCORD_IF_EMPTY", "").lower() in (
         "1",
         "true",
@@ -146,7 +167,14 @@ def main() -> int:
     records = load_records(path) if path.is_file() else []
 
     if not records and skip_if_empty:
-        print("github_discord_job_alert: 0 annonce, webhook ignoré (SKIP_DISCORD_IF_EMPTY)", file=sys.stderr)
+        marker = os.environ.get("DISCORD_SKIP_MARKER", "").strip()
+        if payload_out is not None and marker:
+            Path(marker).parent.mkdir(parents=True, exist_ok=True)
+            Path(marker).write_text("skip\n", encoding="utf-8")
+        print(
+            "github_discord_job_alert: 0 annonce, webhook ignoré (SKIP_DISCORD_IF_EMPTY)",
+            file=sys.stderr,
+        )
         return 0
 
     run_title = os.environ.get(
@@ -154,7 +182,7 @@ def main() -> int:
         f"JobSpy — nouvelles offres ({datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M UTC')})",
     )
     if not records:
-        payload: dict[str, object] = {
+        payload = {
             "embeds": [
                 {
                     "title": run_title,
@@ -165,6 +193,18 @@ def main() -> int:
         }
     else:
         payload = build_body(records, run_title, max_jobs, max_chars)
+
+    if payload_out is not None:
+        payload_out.parent.mkdir(parents=True, exist_ok=True)
+        payload_out.write_text(
+            json.dumps(payload, ensure_ascii=False, separators=(",", ":")),
+            encoding="utf-8",
+        )
+        print(
+            f"github_discord_job_alert: payload écrit dans {payload_out} ({len(records)} annonce(s))",
+            file=sys.stderr,
+        )
+        return 0
 
     try:
         post_webhook(webhook, payload)

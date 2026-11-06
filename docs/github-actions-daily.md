@@ -8,7 +8,7 @@ The workflow [`.github/workflows/daily-job-search.yml`](../.github/workflows/dai
 2. Runs the `jobspy` CLI with repository **variables** (see below), saving full results to `data/last_scrape.jsonl` (ignored by git).
 3. Merges results into **`data/jobspy_seen.sqlite`** via [`scripts/github_jobspy_sqlite.py`](../scripts/github_jobspy_sqlite.py): duplicate detection uses normalized `job_url` when present, otherwise a hash of `site`, `title`, `company`, `date_posted`, and `location`.
 4. Writes only **new** jobs to `data/new_jobs.jsonl`.
-5. Posts a summary to **Discord** using [`scripts/github_discord_job_alert.py`](../scripts/github_discord_job_alert.py).
+5. Builds a JSON body with [`scripts/github_discord_job_alert.py`](../scripts/github_discord_job_alert.py) (`--payload-out`), then posts it with **`curl`** (avoids Python + Discord edge cases on GitHub runners).
 6. Saves the SQLite file in the **Actions cache** so the next run can deduplicate across days.
 
 If the cache is missing or expired, the database starts empty and the first run may list many “new” jobs.
@@ -18,8 +18,6 @@ If the cache is missing or expired, the database starts empty and the first run 
 | Name | Description |
 |------|-------------|
 | `DISCORD_WEBHOOK_URL` | [Incoming webhook](https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks) URL for the target channel — must start with `https://discord.com/api/webhooks/` |
-
-The workflow sets `DISCORD_USE_CURL=1` so the script posts with **curl** on the runner (more reliable than Python’s client on some GitHub IPs).
 
 ## Optional repository variables (`Settings → Secrets and variables → Actions → Variables`)
 
@@ -47,4 +45,4 @@ Use **Actions → Daily JobSpy search → Run workflow** after configuring the s
 1. **Révoquer et recréer le webhook** : Salon → Paramètres → Intégrations → Webhooks → ton webhook → *Réinitialiser l’URL du webhook* ou supprimer et en créer un nouveau, puis remplacer le secret `DISCORD_WEBHOOK_URL` sur GitHub par la **nouvelle** URL complète.
 2. **Vérifier le secret** : il doit être exactement `https://discord.com/api/webhooks/…` ou `https://discordapp.com/api/webhooks/…` (pas seulement l’ID, pas d’espace ni retour à la ligne en trop).
 3. **Droits du salon** : le webhook ne peut pas poster si le canal ou le serveur interdit les intégrations pour ton rôle (rare sur un salon classique).
-4. Après mise à jour du script, un nouvel échec affiche le **corps de la réponse** Discord dans les logs pour faciliter le diagnostic.
+4. En cas d’échec, l’étape **Post to Discord (curl)** affiche le **code HTTP** (ex. `403`) et les **2000 premiers caractères** du corps renvoyé par Discord (sans exposer l’URL du webhook).
