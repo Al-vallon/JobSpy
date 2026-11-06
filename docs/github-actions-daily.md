@@ -28,13 +28,16 @@ If the cache is missing or expired, the database starts empty and the first run 
 | `JOBSPY_LOCATION` | *(empty)* | e.g. `Chicago` — omit for broader search |
 | `JOBSPY_COUNTRY_INDEED` | `usa` | Indeed / Glassdoor country |
 | `JOBSPY_HOURS_OLD` | `72` | Only jobs posted in the last N hours |
-| `JOBSPY_RESULTS` | `5` | `-n` per board |
+| `JOBSPY_RESULTS` | `50` | `-n` per board (upto ~50 per site per README; daily run default is 50) |
 | `JOBSPY_REMOTE_FLAG` | *(empty)* | Set to `1` or `true` to add `--remote` |
 | `JOBSPY_SKIP_DISCORD_IF_EMPTY` | *(empty)* | Set to `1` to skip Discord when there are no new jobs |
-| `JOBSPY_DISCORD_MAX_JOBS` | *(script default 15)* | Max jobs listed in the embed |
+| `JOBSPY_DISCORD_MAX_JOBS` | `50` | Max jobs listed in the Discord embed |
+| `JOBSPY_DISCORD_MAX_EMBED_CHARS` | `4000` | Max length for the embed description (Discord hard limit is 4096; text may still be truncated if many long URLs) |
 | `JOBSPY_DISCORD_TITLE` | auto timestamp | Custom embed title |
 
-Environment variables `MAX_EMBED_CHARS` and `SKIP_DISCORD_IF_EMPTY` are also read by the Discord script if set in the workflow.
+The workflow sets defaults `MAX_JOBS=50` and `MAX_EMBED_CHARS=4000` when those variables are unset. `SKIP_DISCORD_IF_EMPTY` is still read only by the script.
+
+**Note:** `-n` / `JOBSPY_RESULTS` is **per job board** (per site). With four default boards and `50`, you can get up to **200** rows in one scrape before deduplication; only **new** rows go to Discord, up to `MAX_JOBS`.
 
 ## Manual test
 

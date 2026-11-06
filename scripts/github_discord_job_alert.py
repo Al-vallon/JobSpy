@@ -161,8 +161,8 @@ def main() -> int:
         "true",
         "yes",
     )
-    max_jobs = int(os.environ.get("MAX_JOBS") or "15")
-    max_chars = int(os.environ.get("MAX_EMBED_CHARS") or "3800")
+    max_jobs = int(os.environ.get("MAX_JOBS") or "50")
+    max_chars = int(os.environ.get("MAX_EMBED_CHARS") or "4000")
 
     records = load_records(path) if path.is_file() else []
 

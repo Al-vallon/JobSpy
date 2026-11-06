@@ -64,7 +64,7 @@ jobs:
           LOC="${LOCATION:-}"
           COUNTRY="${COUNTRY_INDEED:-usa}"
           HOURS="${HOURS_OLD:-72}"
-          N="${RESULTS:-5}"
+          N="${RESULTS:-50}"
           mkdir -p data
           ARGS=( "$TERM" --site "$SITES" -n "$N" --hours-old "$HOURS" --country-indeed "$COUNTRY" )
           if [ -n "$LOC" ]; then ARGS+=( --location "$LOC" ); fi
@@ -85,10 +85,13 @@ jobs:
         env:
           SKIP_DISCORD_IF_EMPTY: ${{ vars.JOBSPY_SKIP_DISCORD_IF_EMPTY }}
           MAX_JOBS: ${{ vars.JOBSPY_DISCORD_MAX_JOBS }}
+          MAX_EMBED_CHARS: ${{ vars.JOBSPY_DISCORD_MAX_EMBED_CHARS }}
           DISCORD_EMBED_TITLE: ${{ vars.JOBSPY_DISCORD_TITLE }}
           DISCORD_SKIP_MARKER: ${{ env.JOBSPY_DISCORD_SKIP }}
         run: |
           rm -f "$JOBSPY_DISCORD_SKIP" "$JOBSPY_DISCORD_PAYLOAD"
+          export MAX_JOBS="${MAX_JOBS:-50}"
+          export MAX_EMBED_CHARS="${MAX_EMBED_CHARS:-4000}"
           python scripts/github_discord_job_alert.py --payload-out "$JOBSPY_DISCORD_PAYLOAD" "$JOBSPY_NEW_JSONL"
 
       - name: Post to Discord (curl)
