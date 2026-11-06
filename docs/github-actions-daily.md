@@ -39,3 +39,10 @@ Environment variables `MAX_EMBED_CHARS` and `SKIP_DISCORD_IF_EMPTY` are also rea
 ## Manual test
 
 Use **Actions → Daily JobSpy search → Run workflow** after configuring the secret and variables.
+
+## Troubleshooting: Discord `403 Forbidden`
+
+1. **Révoquer et recréer le webhook** : Salon → Paramètres → Intégrations → Webhooks → ton webhook → *Réinitialiser l’URL du webhook* ou supprimer et en créer un nouveau, puis remplacer le secret `DISCORD_WEBHOOK_URL` sur GitHub par la **nouvelle** URL complète.
+2. **Vérifier le secret** : il doit être exactement `https://discord.com/api/webhooks/…` ou `https://discordapp.com/api/webhooks/…` (pas seulement l’ID, pas d’espace ni retour à la ligne en trop).
+3. **Droits du salon** : le webhook ne peut pas poster si le canal ou le serveur interdit les intégrations pour ton rôle (rare sur un salon classique).
+4. Après mise à jour du script, un nouvel échec affiche le **corps de la réponse** Discord dans les logs pour faciliter le diagnostic.

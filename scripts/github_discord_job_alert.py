@@ -65,12 +65,12 @@ def build_body(
 
 def post_webhook(url: str, payload: dict[str, object]) -> None:
     data = json.dumps(payload, ensure_ascii=False).encode("utf-8")
-    req = urllib.request.Request(
-        url,
-        data=data,
-        headers={"Content-Type": "application/json"},
-        method="POST",
-    )
+    # User-Agent évite parfois un 403 côté pare-feu / WAF sur les IP datacenter (ex. GitHub Actions).
+    headers = {
+        "Content-Type": "application/json",
+        "User-Agent": "JobSpy-GitHub-Action/1.0 (+https://github.com/speedyapply/JobSpy)",
+    }
+    req = urllib.request.Request(url, data=data, headers=headers, method="POST")
     with urllib.request.urlopen(req, timeout=30) as resp:
         if resp.status not in (200, 204):
             raise RuntimeError(f"Discord HTTP {resp.status}")
@@ -78,6 +78,7 @@ def post_webhook(url: str, payload: dict[str, object]) -> None:
 
 def main() -> int:
     webhook = os.environ.get("DISCORD_WEBHOOK_URL", "").strip()
+    webhook = webhook.strip('"').strip("'").split()[0] if webhook else ""
     if not webhook:
         print("DISCORD_WEBHOOK_URL manquant", file=sys.stderr)
         return 1
@@ -121,7 +122,18 @@ def main() -> int:
     try:
         post_webhook(webhook, payload)
     except urllib.error.HTTPError as e:
-        print(f"Discord HTTPError: {e}", file=sys.stderr)
+        body = ""
+        try:
+            body = e.read().decode("utf-8", errors="replace")[:2000]
+        except OSError:
+            pass
+        print(
+            f"Discord HTTP {e.code} {e.reason} — vérifie que DISCORD_WEBHOOK_URL est "
+            f"l’URL complète du webhook (Paramètres du salon → Intégrations → Webhooks).",
+            file=sys.stderr,
+        )
+        if body:
+            print(f"Réponse Discord: {body}", file=sys.stderr)
         return 1
     except urllib.error.URLError as e:
         print(f"Discord URLError: {e}", file=sys.stderr)
