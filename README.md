@@ -74,6 +74,13 @@ jobspy nurse --site indeed,linkedin --hours-old 24 -o jobs.jsonl
 jobspy "data analyst" --remote --fields title,company,job_url
 ```
 
+## GitHub Actions: daily search and Discord
+
+This repository includes a scheduled workflow (10:00 UTC daily) that runs the `jobspy` CLI, stores seen jobs in SQLite (cached between runs), and posts **new** listings to a Discord webhook.
+
+- Workflow: [`.github/workflows/daily-job-search.yml`](.github/workflows/daily-job-search.yml)
+- Setup (secret, variables, behaviour): [`docs/github-actions-daily.md`](docs/github-actions-daily.md)
+
 ## MCP server
 
 [`mcp-jobspy`](https://pypi.org/project/mcp-jobspy/) is an MCP server that runs with `uvx mcp-jobspy@latest`. See [mcp/README.md](https://github.com/speedyapply/JobSpy/blob/main/mcp/README.md) for setup, tools and proxies.

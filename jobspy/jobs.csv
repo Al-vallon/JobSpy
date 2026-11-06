@@ -1,0 +1,236 @@
+id,site,job_url,job_url_direct,title,company,location,date_posted,job_type,salary_source,interval,min_amount,max_amount,currency,is_remote,job_level,job_function,listing_type,emails,description,company_industry,company_url,company_logo,company_url_direct,company_addresses,company_num_employees,company_revenue,company_description,skills,experience_range,company_rating,company_reviews_count,vacancy_count,work_from_home_type
+hw-85222200,hellowork,https://www.hellowork.com/fr-fr/emplois/85222200.html,,Développeur Fullstack Java - React H/F,Amiltone,"Nantes, 44, France",2026-11-06,fulltime,,,,,,False,,,,,,,,https://f.hellowork.com/img/entreprises/192533.png?v=20261001112010,,,,,,,,,,,
+hw-85222169,hellowork,https://www.hellowork.com/fr-fr/emplois/85222169.html,,Développeur Fullstack Java - Angular H/F,Amiltone,"Nantes, 44, France",2026-11-06,fulltime,,,,,,False,,,,,,,,https://f.hellowork.com/img/entreprises/192533.png?v=20261001112010,,,,,,,,,,,
+hw-85221431,hellowork,https://www.hellowork.com/fr-fr/emplois/85221431.html,,Développeur Full-Stack .Net H/F,Skaelia,"Saint-Herblain, 44, France",2026-11-06,fulltime,direct_data,yearly,37000.0,45000.0,EUR,False,,,,,,,,https://f.hellowork.com/img/entreprises/202233.png?v=20261018205522,,,,,,,,,,,
+hw-85214503,hellowork,https://www.hellowork.com/fr-fr/emplois/85214503.html,,Développeur Fullstack Js Nestjs - React H/F,Externatic,"Nantes, 44, France",2026-11-05,fulltime,direct_data,yearly,40000.0,45000.0,EUR,False,,,,,,,,https://f.hellowork.com/img/entreprises/196065.png?v=20261001112011,,,,,,,,,,,
+hw-82025706,hellowork,https://www.hellowork.com/fr-fr/emplois/82025706.html,,Développeur Java Fullstack Confirmé H/F,Pulse,"Nantes, 44, France",2026-11-05,fulltime,direct_data,yearly,38000.0,48000.0,EUR,False,,,,,,,,https://f.hellowork.com/img/entreprises/201077.png?v=20261001112012,,,,,,,,,,,
+hw-85174295,hellowork,https://www.hellowork.com/fr-fr/emplois/85174295.html,,Ingénieur Fullstack Java - Spring Boot - IA H/F,Externatic,"Nantes, 44, France",2026-11-05,fulltime,direct_data,yearly,45000.0,55000.0,EUR,False,,,,,,,,https://f.hellowork.com/img/entreprises/196065.png?v=20261001112011,,,,,,,,,,,
+hw-85168621,hellowork,https://www.hellowork.com/fr-fr/emplois/85168621.html,,Développeur Front Fullstack Angular Mobilité Accompagnée sur Nouméa H/F,Seyos,"Nantes, 44, France",2026-11-05,fulltime,,,,,,False,,,,,,,,https://f.hellowork.com/img/entreprises/202104.png?v=20261001112012,,,,,,,,,,,
+hw-83058648,hellowork,https://www.hellowork.com/fr-fr/emplois/83058648.html,,Développeur Full-Stack Typescript Expérimenté H/F,HOCJOB,"Nantes, 44, France",2026-11-05,"temporary, fulltime",direct_data,monthly,1867.06,1867.06,EUR,False,,,,,,,,https://f.hellowork.com/img/entreprises/197433.png?v=20260604132627,,,,,,,,,,,
+hw-85157283,hellowork,https://www.hellowork.com/fr-fr/emplois/85157283.html,,Software Engineering Intern - Fullstack - M - Nantes H/F,,"Nantes, 44, France",2026-11-05,"internship, fulltime",,,,,,False,,,,,,,,,,,,,,,,,,,
+hw-85168572,hellowork,https://www.hellowork.com/fr-fr/emplois/85168572.html,,Architecte Logiciel Java Mobilité Accompagnée sur Nouméa H/F,Seyos,"Nantes, 44, France",2026-11-05,fulltime,,,,,,False,,,,,,,,https://f.hellowork.com/img/entreprises/202104.png?v=20261001112012,,,,,,,,,,,
+hw-62306974,hellowork,https://www.hellowork.com/fr-fr/emplois/62306974.html,,Développeur·se - Java Fullstack - Services Financiers - Nantes H/F,Sopra Steria,"Nantes, 44, France",2026-11-04,fulltime,,,,,,False,,,,,,,,https://f.hellowork.com/img/entreprises/202495.png?v=20261001112012,,,,,,,,,,,
+hw-85128486,hellowork,https://www.hellowork.com/fr-fr/emplois/85128486.html,,Développeur Full Stack Java React H/F,Externatic,"Nantes, 44, France",2026-11-04,fulltime,direct_data,yearly,45000.0,50000.0,EUR,False,,,,,,,,https://f.hellowork.com/img/entreprises/196065.png?v=20261001112011,,,,,,,,,,,
+hw-85123873,hellowork,https://www.hellowork.com/fr-fr/emplois/85123873.html,,Developpeur Full-Stack Java H/F,Conserto,"Saint-Herblain, 44, France",2026-11-04,fulltime,direct_data,yearly,42000.0,55000.0,EUR,False,,,,,,,,https://f.hellowork.com/img/entreprises/194619.png?v=20261001112011,,,,,,,,,,,
+hw-85113252,hellowork,https://www.hellowork.com/fr-fr/emplois/85113252.html,,Développeur Full Stack Senior H/F,LR Technologies Groupe,"Nantes, 44, France",2026-11-04,fulltime,direct_data,yearly,35000.0,50000.0,EUR,False,,,,,,,,https://f.hellowork.com/img/entreprises/199173.png?v=20260604132627,,,,,,,,,,,
+in-496aadc17d016f99,indeed,https://fr.indeed.com/viewjob?jk=496aadc17d016f99,https://www.handicap-job.com/recherche/detail/oid/6716031/responsable-technique-net-c-et-react.html,"Responsable Technique .NET, C# et React",Groupe Talents Handicap,"Nantes, B5, France",2026-11-06,,,,,,,False,,,,,"*En tant qu'organisateur de forums de recrutement, Talents Handicap accompagne de très nombreuses entreprises & organisations en France dans leurs recrutements de collaborateurs en situation de handicap. Participant actuellement à l'un de nos forums.*
+
+*L'entreprise* ***Capgemini*** *recherche actuellement des profils :*
+
+  
+
+Partenaire mondial de la transformation business et technologique, Capgemini intègre la puissance de l’IA pour créer de la valeur pour ses clients. Nous imaginons le futur des organisations et le rendons réel grâce à l’IA, à la technologie et à nos talents. Depuis près de 60 ans, nous sommes un groupe responsable et multiculturel, avec 420000 collaborateurs dans plus de 50 pays. Capgemini propose des services et des solutions de bout en bout, en mobilisant son expertise sectorielle, son écosystème de partenaires et ses compétences de pointe en stratégie, technologie, design, ingénierie et opérations. Le Groupe a réalisé un chiffre d’affaires mondial de 22,1 milliards d’euros en 2024.
+
+Choisir Capgemini, c’est avoir la possibilité de faire la différence, que ce soit pour les plus grandes entreprises du monde ou pour la société.
+
+Nous recherchons des talents pour entreprendre, inventer, oser, accompagner et construire un avenir inclusif et durable. Ensemble, donnons à la technologie cette touche humaine dont le monde a besoin.
+
+Make it real\* | www.capgemini.com
+
+\n\n
+
+**Missions :**
+
+En tant que Tech Lead :
+
+* Vous définirez les orientations techniques du projet et d’accompagner l’équipe de développement dans la réalisation des différentes évolutions.
+* Vous interviendrez sur la conception et le développement d’applications en environnement **.NET / C#** et **React**, tout en garantissant la qualité, la performance et la maintenabilité des solutions.
+* Vous assurerez les revues de code, le mentoring des développeurs, la mise en place des bonnes pratiques et l’amélioration continue.
+* Vous contribuerez également à l’architecture applicative (API, microservices, CI/CD) et collaborerez étroitement avec les équipes produit, UX et QA.
+
+\n\nProfil : Vous disposez d’une expérience confirmée (5 à 7 ans minimum) en développement fullstack sur les technologies .NET / C# et React. Vous maîtrisez l’architecture logicielle, les API, les environnements Cloud (idéalement Azure) et les pipelines CI/CD. Vous êtes un leader technique naturel, vous savez encadrer, accompagner et fédérer une équipe de développeurs. Vous faites preuve d’autonomie, de rigueur, d’esprit d’analyse et possédez un excellent sens de la communication. Vous êtes curieux(se) et orienté(e) qualité. Vous êtes à l’aise dans des environnements agiles et en transformation. Quelques raisons de nous rejoindre Projets variés et à fort impact : Intervenez auprès de grands comptes dans le secteur financier avec des enjeux métiers et technologiques stimulants. Communautés d'expert : Echanges réguliers avec des consultants passionnés en France et à l'international. Qualité de vie au travail : accord de télétravail en France et à l’international, accord sur l’égalité professionnelle, la parentalité, l’équilibre des temps et la mobilité durable. Apprentissage en continu : certifications et formations en libre accès, accompagnement sur mesure avec votre career manager, parcours d’intégration sur 9 mois",,https://fr.indeed.com/cmp/Groupe-Talents-Handicap,https://d2q79iu7y748jz.cloudfront.net/s/_squarelogo/256x256/b93b0c4543c34979edb597b6a84a404a,https://www.groupe-talentshandicap.com/,,,,,,,,,,
+in-301ca94cd103f644,indeed,https://fr.indeed.com/viewjob?jk=301ca94cd103f644,https://www.handicap-job.com/recherche/detail/oid/6716032/developpeuse-developpeur-net-react-c.html,"Développeuse / Développeur .NET, REACT, C#",Groupe Talents Handicap,"Nantes, B5, France",2026-11-06,,,,,,,False,,,,,"*En tant qu'organisateur de forums de recrutement, Talents Handicap accompagne de très nombreuses entreprises & organisations en France dans leurs recrutements de collaborateurs en situation de handicap. Participant actuellement à l'un de nos forums.*
+
+*L'entreprise* ***Capgemini*** *recherche actuellement des profils :*
+
+  
+
+Partenaire mondial de la transformation business et technologique, Capgemini intègre la puissance de l’IA pour créer de la valeur pour ses clients. Nous imaginons le futur des organisations et le rendons réel grâce à l’IA, à la technologie et à nos talents. Depuis près de 60 ans, nous sommes un groupe responsable et multiculturel, avec 420000 collaborateurs dans plus de 50 pays. Capgemini propose des services et des solutions de bout en bout, en mobilisant son expertise sectorielle, son écosystème de partenaires et ses compétences de pointe en stratégie, technologie, design, ingénierie et opérations. Le Groupe a réalisé un chiffre d’affaires mondial de 22,1 milliards d’euros en 2024.
+
+Choisir Capgemini, c’est avoir la possibilité de faire la différence, que ce soit pour les plus grandes entreprises du monde ou pour la société.
+
+Nous recherchons des talents pour entreprendre, inventer, oser, accompagner et construire un avenir inclusif et durable. Ensemble, donnons à la technologie cette touche humaine dont le monde a besoin.
+
+Make it real\* | www.capgemini.com
+
+\n\n
+
+**Mission**
+
+Dans le cadre du développement et de l’évolution de nos applications :
+
+* Vous participerez à la conception, au développement et à la mise en œuvre de nouvelles fonctionnalités en environnement **.NET / C#** et **React**.
+* Vous interviendrez sur l’ensemble de la chaîne applicative : analyse technique, développement backend et frontend, réalisation de tests, intégration continue et optimisation des performances.
+* Vous contribuerez aux bonnes pratiques de développement, à la qualité du code (revues, documentation), et travaillerez en étroite collaboration avec les équipes Produit, UX/UI et QA dans un contexte Agile.
+
+**Nos engagements**
+
+Le groupe Capgemini encourage une culture inclusive dans un cadre multiculturel et handi-accueillant. En nous rejoignant, vous intégrez un collectif qui valorise la diversité, développe le potentiel de ses talents, s’engage dans des initiatives solidaires avec ses partenaires, et se mobilise pour réduire son impact environnemental sur tous ses sites et auprès de ses clients.
+
+À propos de Capgemini :
+
+Capgemini est un leader mondial, responsable et multiculturel, regroupant près de 350000 personnes dans plus de 50 pays. Fort de 55 ans d’expérience, nous sommes un partenaire stratégique des entreprises pour la transformation de leurs activités en tirant profit de toute la puissance de la technologie et des innovations dans les domaines en perpétuelle évolution tels que le cloud, la data, l’Intelligence Artificielle, la connectivité, les logiciels, l’ingénierie digitale ou les plateformes.
+
+\n\nProfil Vous justifiez d’une première expérience solide en développement fullstack avec une bonne maîtrise de .NET / C# pour la partie back-end et React pour la partie front-end. Vous avez une bonne compréhension des architectures applicatives, des API REST, des environnements Cloud (idéalement Azure) et des outils CI/CD. Vous êtes rigoureux(se), autonome et curieux(se). Vous aimez résoudre des problématiques techniques et proposer des solutions. Vous appréciez le travail en équipe, communiquez facilement et évoluez avec aisance dans un environnement agile en pleine transformation. Des projets Banque / Assurance à fort impact : vous intervenez sur des sujets complexes et stratégiques : modernisation des SI bancaires, conformité réglementaire, optimisation des parcours clients, transformation des modèles d’affaires. Communauté d’experts : faites partie d’une communauté d’experts en ingénierie logicielle et développez votre réseau auprès de clients et dirigeants. Apprentissage en continu : accédez librement à des plateformes de formation et bénéficiez de programmes de certification reconnus (Java, Angular, Agile…)",,https://fr.indeed.com/cmp/Groupe-Talents-Handicap,https://d2q79iu7y748jz.cloudfront.net/s/_squarelogo/256x256/b93b0c4543c34979edb597b6a84a404a,https://www.groupe-talentshandicap.com/,,,,,,,,,,
+in-c967872e2e2fc991,indeed,https://fr.indeed.com/viewjob?jk=c967872e2e2fc991,https://www.handicap-job.com/recherche/detail/oid/6715115/developpeurse-java-fullstack-services-financiers-nantes.html,Développeur/se – Java Fullstack - Services Financiers - Nantes,Groupe Talents Handicap,"Nantes, B5, France",2026-11-05,,,,,,,False,,,,,"*En tant qu'organisateur de forums de recrutement, Talents Handicap accompagne de très nombreuses entreprises & organisations en France dans leurs recrutements de collaborateurs en situation de handicap. Participant actuellement à l'un de nos forums.*
+
+*L'entreprise* ***Sopra Steria*** *recherche actuellement des profils :*
+
+  
+
+Sopra Steria, acteur majeur de la Tech en Europe avec 56000 collaborateurs dans près de 30 pays, est reconnu pour ses activités de conseil, de services numériques et d’édition de logiciels. Il aide ses clients à mener leur transformation digitale et à obtenir des bénéfices concrets et durables. Le Groupe apporte une réponse globale aux enjeux de compétitivité des grandes entreprises et organisations, combinant une connaissance approfondie des secteurs d’activité et des technologies innovantes à une approche résolument collaborative. Sopra Steria place l’humain au centre de son action et s’engage auprès de ses clients à tirer le meilleur parti du digital pour construire un avenir positif. En 2023, le Groupe a réalisé un chiffre d’affaires de 5,8 milliards d’euros.
+
+***The world is how we shape it***
+
+\n\n**Description de l'entreprise**
+
+**Sopra Steria**, acteur majeur de la Tech en Europe, avec 51000 collaborateurs dans près de 30 pays, est reconnu pour ses activités de conseil, de services et solutions numériques. Il aide ses clients à mener leur transformation digitale et à obtenir des bénéfices concrets et durables. Le Groupe apporte une réponse globale aux enjeux de compétitivité des grandes entreprises et organisations, en combinant une connaissance approfondie des secteurs d’activité et des technologies à une approche collaborative.  
+  
+Sopra Steria place l’humain au cœur de son action et s’engage auprès de ses clients à tirer le meilleur parti du numérique pour construire un avenir positif. En 2025, le Groupe a réalisé un chiffre d’affaires de 5,6 milliards d’euros.
+
+**Description du poste**
+
+La division « Services Financiers » s’est développée autour des métiers de la banque de détail, de la banque privée et des services financiers spécialisés. Nous participons à la révolution digitale grâce à **notre expertise** . Nous accompagnons la transformation de nos clients en y associant nos compétences.  
+  
+Intégré(e) au sein d’une équipe Sopra Steria pour un de nos Grands Comptes Bancaires, vous participez à un **projet de transformation digitale de grande envergure.**
+
+Votre rôle et vos missions :
+
+Au sein d'une équipe projet de 5 à 15 personnes, vous avez pour missions :
+
+* Vous intervenez en phase de conception et de développement (backend et frontend) des User Stories dans le respect des normes et des standards de développement et de sécurité.
+* Vous prenez en charge des conceptions, des chiffrages & des développements critiques ou complexes.
+* Vous êtes le support des développeurs de l’équipe et réalisez les revues de code (PR/MR).
+* Vous êtes le garant de la chaîne d’intégration continue et des workflows SDLC sur votre stack.
+* Vous contribuez à la capitalisation technique et présentez des sujets techniques au sein des équipes.
+* Vous participez aux avant-ventes lorsque votre domaine d’expertise est concerné.
+* Vous vérifiez l’assistant de code, la génération de tests, l’explication de code existant, l’aide à la documentation et la contribution à des composants intégrant des LLM
+
+Afin de parfaire votre expertise technique, nous vous proposons de prendre part à l’initiative Tech’me UP qui a pour but de valoriser les filières techniques chez Sopra Steria.
+
+Les axes principaux sont les suivants :
+
+* **Excellence Tech** : développer les compétences par du craftsmanship et de l’algorithmie, améliorer les environnements de développement pour répondre aux enjeux de time-to-market et de qualité ;
+* **Image Tech** : préparation et répétition de talk en interne et en externe, conférences et rédaction de billets tech ;
+* **Développement humai**n : permettre à chaque développeur.euse et architecte de trouver sa voie d’évolution jusqu’au plus haut niveau, mettre en lumière les compétences des expert.e.s !
+
+Votre environnement technique : Java 8/11/17, Oracle, PostgreSQL, JBoss EAP 7, Spring, Hibernate, Talend, Angular ou React.
+
+**#LI-HYBRID #TASKFORCE**
+
+**Qualifications**
+
+Votre profil :
+
+Vous disposez d’au moins 4 ans d’expérience en tant que développeur, vous possédez de solides compétences techniques dans les stacks techniques back Java et front React.
+
+Vous avez déjà effectué des missions de conception, expérimentation et mise en œuvre de la structure de l’application avec support aux équipes de développement.
+
+Vous avez expérimenté un assistant de développement IA et savez challenger ses propositions au regard du Clean Code, de la sécurité, de la performance et des standards projet.
+
+Vous avez déjà proposé des présentations/formations sur la bonne implémentation de la stack technique à une petite équipe de développeurs juniors.
+
+Vous avez participé à la mise en œuvre de l’industrialisation, de la CI/CD, recouvrant les aspects de qualimétrie et de sécurité.
+
+Vous êtes sensible au software craftmanship, et aux bonnes bonnes pratiques de développement (SOLID, Clean Code).
+
+Pour finir, vous êtes diplômé(e) d'une école d'Ingénieur ou d'une formation Universitaire ou équivalent.
+
+Vous aimez **relever des challenges** et participer à la modernisation technologique ainsi qu’à la transformation cloud des systèmes d’information IT ? Alors intégrez une entreprise où règne un esprit entrepreneurial fort et une **atmosphère propice à votre évolution** : participez sans plus attendre à une transformation durable grâce à une véritable aventure humaine au sein d'un grand groupe international.
+
+**Informations supplémentaires**
+
+**Ce que nous vous proposons** :
+
+* Un accord télétravail pour télétravailler jusqu’à 2 jours par semaine selon vos missions.
+* Un package avantages intéressant : une mutuelle, un CSE, des titres restaurants, un accord d’intéressement, des primes vacances et cooptation.
+* Des opportunités de carrières multiples : plus de 30 familles de métiers, autant de passerelles à imaginer ensemble.
+* Plusieurs centaines de formations accessibles en toute autonomie avec Sopra Steria Academy.
+* La possibilité de s’engager auprès d’une association grâce à notre plateforme d’engagement citoyen.
+* L'opportunité de rejoindre le collectif Tech'Me UP (formations, conférences, veille, et bien plus encore…)
+
+Employeur inclusif et engagé, notre société œuvre chaque jour pour lutter contre toute forme de discrimination et favoriser un environnement de travail respectueux. C’est pourquoi, attachés à la mixité et à la diversité, nous encourageons toutes les candidatures et tous les profils.
+
+https://www.soprasteria.fr/nous-connaitre/nos-engagements
+
+\n\n",,https://fr.indeed.com/cmp/Groupe-Talents-Handicap,https://d2q79iu7y748jz.cloudfront.net/s/_squarelogo/256x256/b93b0c4543c34979edb597b6a84a404a,https://www.groupe-talentshandicap.com/,,,,,,,,,,
+in-d7743086cad21fba,indeed,https://fr.indeed.com/viewjob?jk=d7743086cad21fba,https://www.handicap-job.com/recherche/detail/oid/6714210/developpeuse-developpeur-fullstack-nantes.html,Développeuse - Développeur Fullstack - Nantes,Groupe Talents Handicap,"Nantes, B5, France",2026-11-04,,,,,,,False,,,,,"*En tant qu'organisateur de forums de recrutement, Talents Handicap accompagne de très nombreuses entreprises & organisations en France dans leurs recrutements de collaborateurs en situation de handicap. Participant actuellement à l'un de nos forums.*
+
+*L'entreprise* ***Capgemini*** *recherche actuellement des profils :*
+
+  
+
+Partenaire mondial de la transformation business et technologique, Capgemini intègre la puissance de l’IA pour créer de la valeur pour ses clients. Nous imaginons le futur des organisations et le rendons réel grâce à l’IA, à la technologie et à nos talents. Depuis près de 60 ans, nous sommes un groupe responsable et multiculturel, avec 420000 collaborateurs dans plus de 50 pays. Capgemini propose des services et des solutions de bout en bout, en mobilisant son expertise sectorielle, son écosystème de partenaires et ses compétences de pointe en stratégie, technologie, design, ingénierie et opérations. Le Groupe a réalisé un chiffre d’affaires mondial de 22,1 milliards d’euros en 2024.
+
+Choisir Capgemini, c’est avoir la possibilité de faire la différence, que ce soit pour les plus grandes entreprises du monde ou pour la société.
+
+Nous recherchons des talents pour entreprendre, inventer, oser, accompagner et construire un avenir inclusif et durable. Ensemble, donnons à la technologie cette touche humaine dont le monde a besoin.
+
+Make it real\* | www.capgemini.com
+
+\n\n
+
+Vos missions :
+
+En tant qu'ingenieur.e logiciel confirmé.e, vous interviendrez sur :
+
+**La compréhension du besoin client**, de sa traduction en **spécifications techniques**, de la gestion en **développement** jusqu'à la **mise en production.**
+
+L'analyse des solutions existantes et pour proposer des améliorations d'optimisation des performances, la scalabilité ou la convivialité des applications, en cycle **agile** !
+
+Des échanges en étroite collaboration avec le client et les membres de l'équipe pour co-construire la solution, et sur une stack technique orientée Java, springboot, Angular.
+
+Votre profil :
+
+Diplomé.e d'un cursus superieur dans l'informatique, vous justifiez de plus de 3 ans d'expériences dans le développement informatique orienté JAVA et/ou Angular,
+
+Réel passionné.e de l'IT, vous êtes touche à tout, et êtes capable de **mener des ateliers de conception** / de **participer à des process de réalisation**
+
+Vous disposez d'un niveau d'anglais professionnel.
+
+\n\nDiplomé.e d'un cursus superieur dans l'informatique, vous justifiez de plus de 3 ans d'expériences dans le développement informatique orienté JAVA et/ou Angular,Réel passionné.e de l'IT, vous êtes touche à tout, et êtes capable de mener des ateliers de conception / de participer à des process de réalisationVous disposez d'un niveau d'anglais professionnel.3 raisons de nous rejoindre :Qualité de vie au travail : accord de télétravail en France et à l’international, accord sur l’égalité professionnelle, la parentalité, l’équilibre des temps et la mobilité durable.Apprentissage en continu : certifications et formations en libre accès, accompagnement sur mesure avec votre people manager, parcours d’intégration sur 9 mois.Avantages groupe & CSE : plan actionnariat, tarif préférentiels, remboursement partiel vacances, remboursement de votre abonnement sportif ou culturel.",,https://fr.indeed.com/cmp/Groupe-Talents-Handicap,https://d2q79iu7y748jz.cloudfront.net/s/_squarelogo/256x256/b93b0c4543c34979edb597b6a84a404a,https://www.groupe-talentshandicap.com/,,,,,,,,,,
+in-ebe8c15950a55b51,indeed,https://fr.indeed.com/viewjob?jk=ebe8c15950a55b51,https://groupelrtechnologies.teamtailor.com/jobs/8660148-developpeur-full-stack-senior-h-f,Développeur Full Stack Senior (H/F),Groupe LR Technologies,"Nantes, B5, France",2026-11-03,,direct_data,monthly,35000.0,50000.0,EUR,False,,,,,"LR Technologies recherche un développeur Fullstack Senior pour accompagner un acteur majeur du commerce à Nantes.
+
+Vous évoluerez sur une stack moderne : Java 25, Spring Boot 4, Vue.js, Kafka et architecture hexagonale.
+
+**Vos missions**
+
+Au sein de l’équipe projet, vous interviendrez sur l’ensemble du cycle de développement :
+
+* Concevoir et développer les fonctionnalités backend en Java 25 / Spring Boot 4 et frontend en Vue.js.
+* Développer et faire évoluer les API et les échanges événementiels avec Kafka.
+* Participer aux choix techniques et à la conception dans le respect d’une architecture hexagonale.
+* Garantir la qualité du code à travers les tests, les revues de code et l’amélioration continue.
+* Analyser les besoins et proposer des solutions techniques adaptées.
+* Partager vos connaissances et accompagner les développeurs de l’équipe.
+* Collaborer en anglais avec les interlocuteurs du projet.
+
+**Votre profil**
+
+Vous disposez d’une expérience confirmée en développement fullstack Java / Vue.js, avec une solide autonomie en conception et en développement d’applications.
+
+Vous maîtrisez l’écosystème Java / Spring Boot, ainsi que Vue.js, et avez déjà travaillé avec Kafka. Vous connaissez les principes de l’architecture hexagonale et savez les appliquer.
+
+Vous appréciez le travail en équipe, le partage de connaissances et les échanges autour des choix techniques.
+
+*Un anglais courant est indispensable pour évoluer dans le contexte international du projet.*",,https://fr.indeed.com/cmp/Groupe-Lr-Technologies,,,,,,,,,,,,
+li-4488137934,linkedin,https://www.linkedin.com/jobs/view/4488137934,,Développeur Fullstack Java / React (H/F),Amiltone,"Nantes, Pays de la Loire, France",2026-11-06,,,,,,,False,,,,,,,https://fr.linkedin.com/company/amiltone,,,,,,,,,,,,
+li-4488137932,linkedin,https://www.linkedin.com/jobs/view/4488137932,,Développeur Fullstack Java / Angular (H/F),Amiltone,"Nantes, Pays de la Loire, France",2026-11-06,,,,,,,False,,,,,,,https://fr.linkedin.com/company/amiltone,,,,,,,,,,,,
+li-4441053069,linkedin,https://www.linkedin.com/jobs/view/4441053069,,Développeur Full Stack Node JS · AI Augmented - F/H,Niji,"Nantes, Pays de la Loire, France",2026-11-06,,,,,,,False,,,,,,,https://fr.linkedin.com/company/niji,,,,,,,,,,,,
+li-4486214524,linkedin,https://www.linkedin.com/jobs/view/4486214524,,Tech Lead Full Stack Java/Angular – Modernisation Expert,Omicrone,"Nantes, Pays de la Loire, France",2026-11-06,,,,,,,False,,,,,,,https://fr.linkedin.com/company/omicrone,,,,,,,,,,,,
+li-4486221066,linkedin,https://www.linkedin.com/jobs/view/4486221066,,Tech Lead Full Stack Java / Angular,Omicrone,"Nantes, Pays de la Loire, France",2026-11-06,,,,,,,False,,,,,,,https://fr.linkedin.com/company/omicrone,,,,,,,,,,,,
+li-4471477930,linkedin,https://www.linkedin.com/jobs/view/4471477930,,Développeur Fullstack Java/ Angular Confirmé F/H,SQLI,"Nantes, Pays de la Loire, France",2026-11-05,,,,,,,False,,,,,,,https://fr.linkedin.com/company/sqli,,,,,,,,,,,,
+li-4485806768,linkedin,https://www.linkedin.com/jobs/view/4485806768,,Développeur Full Stack Java 21 / Vue.js,Free-Work,"Nantes, Pays de la Loire, France",2026-11-05,,,,,,,False,,,,,,,https://fr.linkedin.com/company/free-work-com,,,,,,,,,,,,
+li-4485850196,linkedin,https://www.linkedin.com/jobs/view/4485850196,,Développeur Fullstack Java/ Vue Js,Free-Work,"Angers, Pays de la Loire, France",2026-11-05,,,,,,,False,,,,,,,https://fr.linkedin.com/company/free-work-com,,,,,,,,,,,,
+li-4477163623,linkedin,https://www.linkedin.com/jobs/view/4477163623,,Développeur .NET (H/F),umake,"Nantes, Pays de la Loire, France",2026-11-05,,,,,,,False,,,,,,,https://fr.linkedin.com/company/umakegroup,,,,,,,,,,,,
+li-4487724685,linkedin,https://www.linkedin.com/jobs/view/4487724685,,Responsable technique Java,Capgemini,"Nantes, Pays de la Loire, France",2026-11-05,,,,,,,False,,,,,,,https://fr.linkedin.com/company/capgemini,,,,,,,,,,,,
+li-4469321817,linkedin,https://www.linkedin.com/jobs/view/4469321817,,TECH LEAD JAVA – CMS & SEARCH H/F,Smile,"Nantes, Pays de la Loire, France",2026-11-05,,,,,,,False,,,,,,,https://fr.linkedin.com/company/smile,,,,,,,,,,,,
+li-4470299187,linkedin,https://www.linkedin.com/jobs/view/4470299187,,Développeur Fullstack Java / Angular - H/F,Talan,"Nantes, Pays de la Loire, France",2026-11-04,,,,,,,False,,,,,,,https://fr.linkedin.com/company/talan,,,,,,,,,,,,
+li-4487240727,linkedin,https://www.linkedin.com/jobs/view/4487240727,,Développeur/se – Java Fullstack - Services Financiers - Nantes,Sopra Steria,"Nantes, Pays de la Loire, France",2026-11-04,,,,,,,False,,,,,,,https://fr.linkedin.com/company/soprasteria,,,,,,,,,,,,
+li-4182196383,linkedin,https://www.linkedin.com/jobs/view/4182196383,,Développeur et Lead Dev Fullstack JS (AngularJS et/ou ReactJS) (H/F),Davidson consulting,"Nantes, Pays de la Loire, France",2026-11-04,,,,,,,False,,,,,,,https://fr.linkedin.com/company/davidson-consulting,,,,,,,,,,,,
+li-4485529782,linkedin,https://www.linkedin.com/jobs/view/4485529782,,CHEF DE PROJETS WEB PHP H/F - CDI,FDI,"Cholet, Pays de la Loire, France",2026-11-04,,,,,,,False,,,,,,,https://fr.linkedin.com/company/fdi-access,,,,,,,,,,,,
+li-4486363532,linkedin,https://www.linkedin.com/jobs/view/4486363532,,Senior Software Engineer HF,HiPay,"Nantes, Pays de la Loire, France",2026-11-04,,,,,,,False,,,,,,,https://fr.linkedin.com/company/hipay,,,,,,,,,,,,
+li-4486887893,linkedin,https://www.linkedin.com/jobs/view/4486887893,,Développeur Fullstack - Services Financiers - Angers,Sopra Steria,"Angers, Pays de la Loire, France",2026-11-03,,,,,,,False,,,,,,,https://fr.linkedin.com/company/soprasteria,,,,,,,,,,,,
+li-4433379156,linkedin,https://www.linkedin.com/jobs/view/4433379156,,Développeur .NET (F/H) - NANTES,SQLI,"Nantes, Pays de la Loire, France",2026-11-03,,,,,,,False,,,,,,,https://fr.linkedin.com/company/sqli,,,,,,,,,,,,
+li-4486062451,linkedin,https://www.linkedin.com/jobs/view/4486062451,,DEVELOPPEUR FULL-STACK JAVA (F/H),Conserto,"Saint-Herblain, Pays de la Loire, France",2026-11-03,,,,,,,False,,,,,,,https://fr.linkedin.com/company/conserto,,,,,,,,,,,,
+li-4486879567,linkedin,https://www.linkedin.com/jobs/view/4486879567,,Consultant technique Salesforce à Nantes H//F,Klint,"Nantes, Pays de la Loire, France",2026-11-03,,,,,,,False,,,,,,,https://fr.linkedin.com/company/klint-consulting,,,,,,,,,,,,

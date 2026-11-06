@@ -1,0 +1,96 @@
+name: Daily JobSpy search
+
+on:
+  schedule:
+    - cron: "0 10 * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: daily-jobspy-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+env:
+  JOBSPY_SQLITE_PATH: data/jobspy_seen.sqlite
+  JOBSPY_ALL_JSONL: data/last_scrape.jsonl
+  JOBSPY_NEW_JSONL: data/new_jobs.jsonl
+  JOBSPY_CACHE_KEY_PREFIX: jobspy-sqlite-${{ github.repository }}
+
+jobs:
+  search:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+
+      - name: Restore SQLite cache
+        id: cache-db
+        uses: actions/cache@v4
+        with:
+          path: data/jobspy_seen.sqlite
+          key: ${{ env.JOBSPY_CACHE_KEY_PREFIX }}-${{ hashFiles('scripts/github_jobspy_sqlite.py') }}
+          restore-keys: |
+            ${{ env.JOBSPY_CACHE_KEY_PREFIX }}-
+
+      - name: Install JobSpy from this repo
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install build
+          python -m build --wheel
+          python -m pip install --only-binary :all: dist/*.whl
+
+      - name: Run jobspy
+        env:
+          SEARCH_TERM: ${{ vars.JOBSPY_SEARCH_TERM }}
+          SITE: ${{ vars.JOBSPY_SITE }}
+          LOCATION: ${{ vars.JOBSPY_LOCATION }}
+          COUNTRY_INDEED: ${{ vars.JOBSPY_COUNTRY_INDEED }}
+          HOURS_OLD: ${{ vars.JOBSPY_HOURS_OLD }}
+          RESULTS: ${{ vars.JOBSPY_RESULTS }}
+          REMOTE_FLAG: ${{ vars.JOBSPY_REMOTE_FLAG }}
+        run: |
+          set -euo pipefail
+          TERM="${SEARCH_TERM:-software engineer}"
+          SITES="${SITE:-indeed,linkedin,zip_recruiter,glassdoor}"
+          LOC="${LOCATION:-}"
+          COUNTRY="${COUNTRY_INDEED:-usa}"
+          HOURS="${HOURS_OLD:-72}"
+          N="${RESULTS:-5}"
+          mkdir -p data
+          ARGS=( "$TERM" --site "$SITES" -n "$N" --hours-old "$HOURS" --country-indeed "$COUNTRY" )
+          if [ -n "$LOC" ]; then ARGS+=( --location "$LOC" ); fi
+          if [ "${REMOTE_FLAG:-}" = "1" ] || [ "${REMOTE_FLAG:-}" = "true" ]; then ARGS+=( --remote ); fi
+          ARGS+=( --fields id,site,title,company,location,date_posted,job_url,job_type,is_remote -q -o "$JOBSPY_ALL_JSONL" )
+          set +e
+          jobspy "${ARGS[@]}" > /dev/null
+          code=$?
+          set -e
+          echo "jobspy exit code: $code"
+          exit "$code"
+
+      - name: Merge into SQLite (new jobs only)
+        run: |
+          python scripts/github_jobspy_sqlite.py "$JOBSPY_ALL_JSONL" "$JOBSPY_NEW_JSONL" --db "$JOBSPY_SQLITE_PATH"
+
+      - name: Post to Discord
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          SKIP_DISCORD_IF_EMPTY: ${{ vars.JOBSPY_SKIP_DISCORD_IF_EMPTY }}
+          MAX_JOBS: ${{ vars.JOBSPY_DISCORD_MAX_JOBS }}
+          DISCORD_EMBED_TITLE: ${{ vars.JOBSPY_DISCORD_TITLE }}
+        run: |
+          python scripts/github_discord_job_alert.py "$JOBSPY_NEW_JSONL"
+
+      - name: Save SQLite cache
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: data/jobspy_seen.sqlite
+          key: ${{ env.JOBSPY_CACHE_KEY_PREFIX }}-${{ github.run_id }}-${{ github.run_attempt }}

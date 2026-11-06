@@ -8,3 +8,7 @@
 *.pyc
 .env
 dist
+
+# Local/cache data for GitHub Actions helper scripts
+data/*.sqlite
+data/*.jsonl
