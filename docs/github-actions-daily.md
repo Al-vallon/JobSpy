@@ -24,7 +24,7 @@ If the cache is missing or expired, the database starts empty and the first run 
 Instead of many separate repository variables, create **one** variable:
 
 - **Name:** `JOBSPY_DOTENV`
-- **Value:** several lines `KEY=value` (same keys as in bash below). Lines starting with `#` are ignored.
+- **Value:** several lines `KEY=value` (same keys as in bash below). Lines starting with `#` are ignored. **Spaces in values are OK** (e.g. `DISCORD_EMBED_TITLE=Offres web — Nantes`): the workflow rewrites the file with proper shell quoting.
 
 Keys read by the workflow (after you push the version of the workflow that supports this):
 

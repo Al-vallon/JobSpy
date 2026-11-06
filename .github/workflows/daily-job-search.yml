@@ -52,7 +52,7 @@ jobs:
         if: ${{ vars.JOBSPY_DOTENV != '' }}
         env:
           JOBSPY_DOTENV: ${{ vars.JOBSPY_DOTENV }}
-        run: bash scripts/github_actions_load_dotenv.sh
+        run: python3 scripts/github_jobspy_write_dotenv.py
 
       - name: Run jobspy
         env:
