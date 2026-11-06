@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import json
 import os
+import subprocess
 import sys
 import urllib.error
 import urllib.request
@@ -63,12 +64,19 @@ def build_body(
     }
 
 
-def post_webhook(url: str, payload: dict[str, object]) -> None:
+def _webhook_url_ok(url: str) -> bool:
+    return bool(
+        url.startswith("https://discord.com/api/webhooks/")
+        or url.startswith("https://discordapp.com/api/webhooks/")
+    )
+
+
+def post_webhook_urllib(url: str, payload: dict[str, object]) -> None:
     data = json.dumps(payload, ensure_ascii=False).encode("utf-8")
     # User-Agent évite parfois un 403 côté pare-feu / WAF sur les IP datacenter (ex. GitHub Actions).
     headers = {
         "Content-Type": "application/json",
-        "User-Agent": "JobSpy-GitHub-Action/1.0 (+https://github.com/speedyapply/JobSpy)",
+        "User-Agent": "DiscordBot (https://github.com/speedyapply/JobSpy, 1.0)",
     }
     req = urllib.request.Request(url, data=data, headers=headers, method="POST")
     with urllib.request.urlopen(req, timeout=30) as resp:
@@ -76,11 +84,50 @@ def post_webhook(url: str, payload: dict[str, object]) -> None:
             raise RuntimeError(f"Discord HTTP {resp.status}")
 
 
+def post_webhook_curl(url: str, payload: dict[str, object]) -> None:
+    """Secours : curl utilise une autre pile TLS ; contourne parfois un 403 sur Actions."""
+    data = json.dumps(payload, ensure_ascii=False)
+    r = subprocess.run(
+        [
+            "curl",
+            "-sS",
+            "-f",
+            "-X",
+            "POST",
+            url,
+            "-H",
+            "Content-Type: application/json",
+            "-d",
+            data,
+        ],
+        capture_output=True,
+        text=True,
+        timeout=45,
+    )
+    if r.returncode != 0:
+        err = (r.stderr or r.stdout or "").strip()[:2000]
+        raise RuntimeError(f"curl exit {r.returncode}: {err or 'no output'}")
+
+
+def post_webhook(url: str, payload: dict[str, object]) -> None:
+    if os.environ.get("DISCORD_USE_CURL", "").lower() in ("1", "true", "yes"):
+        post_webhook_curl(url, payload)
+        return
+    post_webhook_urllib(url, payload)
+
+
 def main() -> int:
     webhook = os.environ.get("DISCORD_WEBHOOK_URL", "").strip()
     webhook = webhook.strip('"').strip("'").split()[0] if webhook else ""
     if not webhook:
         print("DISCORD_WEBHOOK_URL manquant", file=sys.stderr)
+        return 1
+    if not _webhook_url_ok(webhook):
+        print(
+            "DISCORD_WEBHOOK_URL doit être l’URL complète du webhook (https://discord.com/api/webhooks/…), "
+            "pas un token seul ni une autre API.",
+            file=sys.stderr,
+        )
         return 1
 
     if len(sys.argv) < 2:
@@ -128,13 +175,27 @@ def main() -> int:
         except OSError:
             pass
         print(
-            f"Discord HTTP {e.code} {e.reason} — vérifie que DISCORD_WEBHOOK_URL est "
-            f"l’URL complète du webhook (Paramètres du salon → Intégrations → Webhooks).",
+            f"Discord HTTP {e.code} {e.reason} — vérifie DISCORD_WEBHOOK_URL (webhook salon → Intégrations).",
             file=sys.stderr,
         )
         if body:
             print(f"Réponse Discord: {body}", file=sys.stderr)
-        return 1
+        if e.code == 403:
+            print(
+                "Tentative de secours avec curl (parfois nécessaire sur GitHub Actions)…",
+                file=sys.stderr,
+            )
+            try:
+                post_webhook_curl(webhook, payload)
+            except (RuntimeError, OSError, subprocess.TimeoutExpired) as retry:
+                print(f"Secours curl: {retry}", file=sys.stderr)
+                print(
+                    "Si les deux échouent : régénère l’URL du webhook dans Discord et mets à jour le secret.",
+                    file=sys.stderr,
+                )
+                return 1
+        else:
+            return 1
     except urllib.error.URLError as e:
         print(f"Discord URLError: {e}", file=sys.stderr)
         return 1

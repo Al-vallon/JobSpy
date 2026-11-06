@@ -82,6 +82,7 @@ jobs:
       - name: Post to Discord
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          DISCORD_USE_CURL: "1"
           SKIP_DISCORD_IF_EMPTY: ${{ vars.JOBSPY_SKIP_DISCORD_IF_EMPTY }}
           MAX_JOBS: ${{ vars.JOBSPY_DISCORD_MAX_JOBS }}
           DISCORD_EMBED_TITLE: ${{ vars.JOBSPY_DISCORD_TITLE }}

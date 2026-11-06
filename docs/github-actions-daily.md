@@ -17,7 +17,9 @@ If the cache is missing or expired, the database starts empty and the first run 
 
 | Name | Description |
 |------|-------------|
-| `DISCORD_WEBHOOK_URL` | [Incoming webhook](https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks) URL for the target channel |
+| `DISCORD_WEBHOOK_URL` | [Incoming webhook](https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks) URL for the target channel — must start with `https://discord.com/api/webhooks/` |
+
+The workflow sets `DISCORD_USE_CURL=1` so the script posts with **curl** on the runner (more reliable than Python’s client on some GitHub IPs).
 
 ## Optional repository variables (`Settings → Secrets and variables → Actions → Variables`)
 
