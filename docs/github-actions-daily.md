@@ -29,7 +29,7 @@ Instead of many separate repository variables, create **one** variable:
 Keys read by the workflow (after you push the version of the workflow that supports this):
 
 ```
-SEARCH_TERM=développeur web
+SEARCH_TERM=développeur web, cybersécurité
 SITE=indeed,linkedin,hellowork,glassdoor
 LOCATION=Nantes
 COUNTRY_INDEED=france
@@ -40,7 +40,7 @@ REMOTE_FLAG=
 SKIP_DISCORD_IF_EMPTY=1
 MAX_JOBS=50
 MAX_EMBED_CHARS=3900
-DISCORD_EMBED_TITLE=Offres web — Nantes
+DISCORD_EMBED_TITLE=Offres Web & Cyber — Nantes
 ```
 
 Leave a key empty (e.g. `REMOTE_FLAG=`) to mean “not set”. If `JOBSPY_DOTENV` is **non-empty**, it **overrides** the individual `JOBSPY_*` variables for search + Discord payload (individual vars act as fallback when a key is missing from the block).
@@ -51,7 +51,7 @@ Leave a key empty (e.g. `REMOTE_FLAG=`) to mean “not set”. If `JOBSPY_DOTENV
 
 | Variable | Default (if unset) | Description |
 |----------|---------------------|-------------|
-| `JOBSPY_SEARCH_TERM` | `software engineer` | Query passed to `jobspy` |
+| `JOBSPY_SEARCH_TERM` | `software engineer` | Query (or comma/semicolon-separated list of queries, e.g. `développeur web, cybersécurité`) passed to `jobspy` |
 | `JOBSPY_SITE` | `indeed,linkedin,zip_recruiter,glassdoor` | Comma-separated boards |
 | `JOBSPY_LOCATION` | *(empty)* | e.g. `Chicago` — omit for broader search |
 | `JOBSPY_COUNTRY_INDEED` | `usa` | Indeed / Glassdoor country |

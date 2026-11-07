@@ -83,9 +83,10 @@ jobs:
           JTYPE="${JOB_TYPE:-${FALLBACK_JOB_TYPE:-}}"
           mkdir -p data
           rm -f "$JOBSPY_ALL_JSONL"
-          BASE_ARGS=( "$TERM" --site "$SITES" -n "$N" --hours-old "$HOURS" --country-indeed "$COUNTRY" )
-          if [ -n "$LOC" ]; then BASE_ARGS+=( --location "$LOC" ); fi
-          if [ "${REMOTE_FLAG:-}" = "1" ] || [ "${REMOTE_FLAG:-}" = "true" ]; then BASE_ARGS+=( --remote ); fi
+          > "$JOBSPY_ALL_JSONL"
+          COMMON_ARGS=( --site "$SITES" -n "$N" --hours-old "$HOURS" --country-indeed "$COUNTRY" )
+          if [ -n "$LOC" ]; then COMMON_ARGS+=( --location "$LOC" ); fi
+          if [ "${REMOTE_FLAG:-}" = "1" ] || [ "${REMOTE_FLAG:-}" = "true" ]; then COMMON_ARGS+=( --remote ); fi
           FIELDS_ARG="--fields id,site,title,company,location,date_posted,job_url,job_type,is_remote"
 
           map_job_type() {
@@ -99,27 +100,25 @@ jobs:
             esac
           }
 
-          if [ -z "$JTYPE" ]; then
-            set +e
-            jobspy "${BASE_ARGS[@]}" $FIELDS_ARG -q -o "$JOBSPY_ALL_JSONL" > /dev/null
-            code=$?
-            set -e
-            echo "jobspy exit code: $code"
-            exit "$code"
-          else
-            IFS=',' read -ra TYPES <<< "$JTYPE"
-            any_ok=0
-            last_code=0
-            > "$JOBSPY_ALL_JSONL"
-            for raw_t in "${TYPES[@]}"; do
-              t_trimmed="$(echo "$raw_t" | xargs)"
-              [ -z "$t_trimmed" ] && continue
-              mapped="$(map_job_type "$t_trimmed")"
-              tmp_file="data/scrape_${mapped}.jsonl"
+          # Supporte plusieurs recherches séparées par "," ou ";" (ex: "développeur web, cybersécurité")
+          TERMS_NORMALIZED="${TERM//;/,}"
+          IFS=',' read -ra SEARCH_TERMS <<< "$TERMS_NORMALIZED"
+
+          any_ok=0
+          last_code=0
+          run_idx=0
+
+          for raw_term in "${SEARCH_TERMS[@]}"; do
+            q_trimmed="$(echo "$raw_term" | xargs)"
+            [ -z "$q_trimmed" ] && continue
+
+            if [ -z "$JTYPE" ]; then
+              run_idx=$((run_idx + 1))
+              tmp_file="data/scrape_${run_idx}.jsonl"
               rm -f "$tmp_file"
-              echo "Running jobspy with --job-type $mapped ..."
+              echo "Running jobspy for '$q_trimmed' ..."
               set +e
-              jobspy "${BASE_ARGS[@]}" --job-type "$mapped" $FIELDS_ARG -q -o "$tmp_file" > /dev/null
+              jobspy "$q_trimmed" "${COMMON_ARGS[@]}" $FIELDS_ARG -q -o "$tmp_file" > /dev/null
               c=$?
               set -e
               if [ "$c" -eq 0 ]; then
@@ -128,10 +127,32 @@ jobs:
               else
                 last_code=$c
               fi
-            done
-            if [ "$any_ok" -eq 0 ] && [ "$last_code" -ne 0 ]; then
-              exit "$last_code"
+            else
+              IFS=',' read -ra TYPES <<< "$JTYPE"
+              for raw_t in "${TYPES[@]}"; do
+                t_trimmed="$(echo "$raw_t" | xargs)"
+                [ -z "$t_trimmed" ] && continue
+                mapped="$(map_job_type "$t_trimmed")"
+                run_idx=$((run_idx + 1))
+                tmp_file="data/scrape_${run_idx}_${mapped}.jsonl"
+                rm -f "$tmp_file"
+                echo "Running jobspy for '$q_trimmed' with --job-type $mapped ..."
+                set +e
+                jobspy "$q_trimmed" "${COMMON_ARGS[@]}" --job-type "$mapped" $FIELDS_ARG -q -o "$tmp_file" > /dev/null
+                c=$?
+                set -e
+                if [ "$c" -eq 0 ]; then
+                  any_ok=1
+                  [ -f "$tmp_file" ] && cat "$tmp_file" >> "$JOBSPY_ALL_JSONL"
+                else
+                  last_code=$c
+                fi
+              done
             fi
+          done
+
+          if [ "$any_ok" -eq 0 ] && [ "$last_code" -ne 0 ]; then
+            exit "$last_code"
           fi
 
       - name: Merge into SQLite (new jobs only)
