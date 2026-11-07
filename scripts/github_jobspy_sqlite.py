@@ -11,6 +11,29 @@ import sqlite3
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
+from zoneinfo import ZoneInfo
+
+JOB_TYPE_ALIASES = {
+    "cdi": "fulltime",
+    "permanent": "fulltime",
+    "fulltime": "fulltime",
+    "full_time": "fulltime",
+    "full-time": "fulltime",
+    "cdd": "temporary",
+    "temporary": "temporary",
+    "interim": "temporary",
+    "intérim": "temporary",
+    "contract": "contract",
+    "freelance": "contract",
+    "independant": "contract",
+    "indépendant": "contract",
+    "parttime": "parttime",
+    "part_time": "parttime",
+    "part-time": "parttime",
+    "internship": "internship",
+    "stage": "internship",
+    "alternance": "internship",
+}
 
 
 def _norm_url(url: str | None) -> str:
@@ -23,6 +46,34 @@ def _norm_part(value: object) -> str:
     if value is None:
         return ""
     return str(value).strip().lower()
+
+
+def parse_allowed_job_types(raw: str | None) -> set[str]:
+    if not raw or not raw.strip():
+        return set()
+    allowed: set[str] = set()
+    for part in raw.split(","):
+        token = part.strip().lower()
+        if not token:
+            continue
+        allowed.add(JOB_TYPE_ALIASES.get(token, token))
+    return allowed
+
+
+def matches_job_type(record: dict[str, object], allowed: set[str]) -> bool:
+    if not allowed:
+        return True
+    raw_jt = record.get("job_type")
+    if not raw_jt or not str(raw_jt).strip():
+        # Si le site ne renseigne pas job_type sur la carte mais que la requête
+        # a déjà filtré avec --job-type côté JobSpy, on garde l'annonce.
+        return True
+    rec_types = {
+        JOB_TYPE_ALIASES.get(t.strip().lower(), t.strip().lower())
+        for t in str(raw_jt).split(",")
+        if t.strip()
+    }
+    return bool(rec_types & allowed)
 
 
 def dedup_key(record: dict[str, object]) -> str:
@@ -56,9 +107,18 @@ def init_db(conn: sqlite3.Connection) -> None:
 
 
 def merge(
-    conn: sqlite3.Connection, input_path: Path, output_new_path: Path
+    conn: sqlite3.Connection,
+    input_path: Path,
+    output_new_path: Path,
+    allowed_job_types: set[str],
 ) -> tuple[int, int]:
-    now = datetime.now(timezone.utc).isoformat()
+    now_dt = datetime.now(timezone.utc)
+    now = now_dt.isoformat()
+    try:
+        paris_str = now_dt.astimezone(ZoneInfo("Europe/Paris")).strftime("%Y-%m-%d %H:%M")
+    except Exception:
+        paris_str = now_dt.strftime("%Y-%m-%d %H:%M UTC")
+
     seen_new = 0
     total_in = 0
     lines_out: list[str] = []
@@ -70,18 +130,25 @@ def merge(
                 continue
             total_in += 1
             record: dict[str, object] = json.loads(line)
+            if not matches_job_type(record, allowed_job_types):
+                continue
+
             key = dedup_key(record)
-            payload = json.dumps(record, ensure_ascii=False, separators=(",", ":"))
+            cur = conn.execute(
+                "SELECT first_seen_at FROM jobs WHERE dedup_key = ?", (key,)
+            )
+            row = cur.fetchone()
 
-            cur = conn.execute("SELECT dedup_key FROM jobs WHERE dedup_key = ?", (key,))
-            exists = cur.fetchone() is not None
-
-            if exists:
+            if row is not None:
+                record.setdefault("detected_at", paris_str)
+                payload = json.dumps(record, ensure_ascii=False, separators=(",", ":"))
                 conn.execute(
                     "UPDATE jobs SET last_seen_at = ?, payload = ? WHERE dedup_key = ?",
                     (now, payload, key),
                 )
             else:
+                record["detected_at"] = paris_str
+                payload = json.dumps(record, ensure_ascii=False, separators=(",", ":"))
                 conn.execute(
                     """
                     INSERT INTO jobs (dedup_key, payload, first_seen_at, last_seen_at)
@@ -109,6 +176,11 @@ def main() -> int:
         default=Path(os.environ.get("JOBSPY_SQLITE_PATH", "data/jobspy_seen.sqlite")),
         help="chemin SQLite (défaut: JOBSPY_SQLITE_PATH ou data/jobspy_seen.sqlite)",
     )
+    p.add_argument(
+        "--job-types",
+        default=os.environ.get("JOB_TYPE", ""),
+        help="liste de types autorisés (ex: fulltime,temporary ou cdi,cdd)",
+    )
     args = p.parse_args()
     db_path: Path = args.db
     db_path.parent.mkdir(parents=True, exist_ok=True)
@@ -120,10 +192,13 @@ def main() -> int:
             file=sys.stderr,
         )
         return 0
+    allowed = parse_allowed_job_types(args.job_types)
     conn = sqlite3.connect(db_path)
     try:
         init_db(conn)
-        total, new_count = merge(conn, args.input_jsonl, args.output_new_jsonl)
+        total, new_count = merge(
+            conn, args.input_jsonl, args.output_new_jsonl, allowed
+        )
     finally:
         conn.close()
     print(
@@ -135,5 +210,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-
-

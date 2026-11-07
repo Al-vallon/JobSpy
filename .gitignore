@@ -13,5 +13,6 @@ dist
 data/*.sqlite
 data/*.jsonl
 data/discord_payload.json
+data/discord_payload.jsonl
 data/discord_skipped
 .jobspy.env

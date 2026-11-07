@@ -12,6 +12,17 @@ import urllib.request
 from datetime import datetime, timezone
 from pathlib import Path
 
+JOB_TYPE_FR = {
+    "fulltime": "CDI / Temps plein",
+    "temporary": "CDD / Intérim",
+    "contract": "Contrat / Freelance",
+    "parttime": "Temps partiel",
+    "internship": "Stage / Alternance",
+    "perdiem": "Per diem",
+    "volunteer": "Bénévolat",
+    "other": "Autre",
+}
+
 
 def load_records(path: Path) -> list[dict[str, object]]:
     rows: list[dict[str, object]] = []
@@ -24,44 +35,128 @@ def load_records(path: Path) -> list[dict[str, object]]:
     return rows
 
 
+def _format_job_type(raw: object) -> str:
+    if not raw:
+        return ""
+    parts = [p.strip() for p in str(raw).split(",") if p.strip()]
+    translated = [JOB_TYPE_FR.get(p.lower(), p) for p in parts]
+    return ", ".join(dict.fromkeys(translated))
+
+
 def format_line(rec: dict[str, object], index: int) -> str:
     title = str(rec.get("title") or "?")
     company = str(rec.get("company") or "?")
     site = str(rec.get("site") or "")
     url = str(rec.get("job_url") or "")
-    parts = [f"{index}. **{title}** — {company}"]
+    date_posted = str(rec.get("date_posted") or "")
+    detected_at = str(rec.get("detected_at") or "")
+    job_type_str = _format_job_type(rec.get("job_type"))
+    location = str(rec.get("location") or "")
+
+    header = f"{index}. **{title}** — {company}"
+    meta_parts: list[str] = []
     if site:
-        parts.append(f"   ({site})")
+        meta_parts.append(site)
+    if job_type_str:
+        meta_parts.append(job_type_str)
+    if location:
+        meta_parts.append(location)
+    if date_posted and detected_at:
+        meta_parts.append(f"Publié : {date_posted} (détecté : {detected_at})")
+    elif date_posted:
+        meta_parts.append(f"Publié : {date_posted}")
+    elif detected_at:
+        meta_parts.append(f"Détecté : {detected_at}")
+
+    lines = [header]
+    if meta_parts:
+        lines.append("   " + " • ".join(meta_parts))
     if url:
-        parts.append(f"   {url}")
-    return "\n".join(parts)
+        lines.append(f"   {url}")
+    return "\n".join(lines)
 
 
-def build_body(
+def build_payloads(
     records: list[dict[str, object]],
     title: str,
     max_jobs: int,
-    max_desc_chars: int,
-) -> dict[str, object]:
+    max_desc_chars: int = 3900,
+) -> list[dict[str, object]]:
+    """Découpe les annonces en plusieurs embeds / payloads pour afficher les `max_jobs` sans tronquer."""
     total = len(records)
     shown = records[:max_jobs]
-    lines = [format_line(rec, i + 1) for i, rec in enumerate(shown)]
-    body = "\n\n".join(lines) if lines else "_Aucune annonce dans ce fichier._"
-    footer = ""
-    if total > len(shown):
-        footer = f"\n\n… et {total - len(shown)} autre(s) annonce(s)."
-    description = (body + footer).strip()
-    if len(description) > max_desc_chars:
-        description = description[: max_desc_chars - 20] + "\n\n… _(tronqué)_"
-    return {
-        "embeds": [
+    if not shown:
+        return [
             {
-                "title": title,
-                "description": description,
-                "color": 5763719,
+                "embeds": [
+                    {
+                        "title": title,
+                        "description": "_Aucune annonce dans ce fichier._",
+                        "color": 9807270,
+                    }
+                ]
             }
         ]
-    }
+
+    formatted_items = [format_line(rec, i + 1) for i, rec in enumerate(shown)]
+    if total > len(shown):
+        formatted_items.append(
+            f"_… et {total - len(shown)} autre(s) annonce(s) au-delà de MAX_JOBS={max_jobs}._"
+        )
+
+    # Limite Discord : 4096 caractères par description d'embed, et ~6000 caractères cumulés par requête webhook.
+    per_embed_limit = min(max(max_desc_chars, 1000), 4000)
+    embeds: list[dict[str, object]] = []
+    current_lines: list[str] = []
+    current_len = 0
+
+    for item in formatted_items:
+        sep_len = 2 if current_lines else 0
+        if current_lines and current_len + sep_len + len(item) > per_embed_limit:
+            embeds.append(
+                {
+                    "description": "\n\n".join(current_lines),
+                    "color": 5763719,
+                }
+            )
+            current_lines = [item]
+            current_len = len(item)
+        else:
+            current_lines.append(item)
+            current_len += sep_len + len(item)
+
+    if current_lines:
+        embeds.append(
+            {
+                "description": "\n\n".join(current_lines),
+                "color": 5763719,
+            }
+        )
+
+    total_embeds = len(embeds)
+    for idx, emb in enumerate(embeds):
+        if total_embeds == 1:
+            emb["title"] = title
+        else:
+            emb["title"] = f"{title} ({idx + 1}/{total_embeds})"
+
+    # Regrouper les embeds par requête webhook sans dépasser ~5500 caractères ni 10 embeds par POST
+    payloads: list[dict[str, object]] = []
+    batch: list[dict[str, object]] = []
+    batch_chars = 0
+    for emb in embeds:
+        emb_chars = len(str(emb.get("title", ""))) + len(str(emb.get("description", "")))
+        if batch and (len(batch) >= 10 or batch_chars + emb_chars > 5500):
+            payloads.append({"embeds": batch})
+            batch = [emb]
+            batch_chars = emb_chars
+        else:
+            batch.append(emb)
+            batch_chars += emb_chars
+    if batch:
+        payloads.append({"embeds": batch})
+
+    return payloads
 
 
 def _webhook_url_ok(url: str) -> bool:
@@ -73,7 +168,6 @@ def _webhook_url_ok(url: str) -> bool:
 
 def post_webhook_urllib(url: str, payload: dict[str, object]) -> None:
     data = json.dumps(payload, ensure_ascii=False).encode("utf-8")
-    # User-Agent évite parfois un 403 côté pare-feu / WAF sur les IP datacenter (ex. GitHub Actions).
     headers = {
         "Content-Type": "application/json",
         "User-Agent": "DiscordBot (https://github.com/speedyapply/JobSpy, 1.0)",
@@ -162,7 +256,7 @@ def main() -> int:
         "yes",
     )
     max_jobs = int(os.environ.get("MAX_JOBS") or "50")
-    max_chars = int(os.environ.get("MAX_EMBED_CHARS") or "4000")
+    max_chars = int(os.environ.get("MAX_EMBED_CHARS") or "3900")
 
     records = load_records(path) if path.is_file() else []
 
@@ -177,74 +271,75 @@ def main() -> int:
         )
         return 0
 
-    run_title = os.environ.get(
-        "DISCORD_EMBED_TITLE",
-        f"JobSpy — nouvelles offres ({datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M UTC')})",
+    run_title = os.environ.get("DISCORD_EMBED_TITLE", "").strip() or (
+        f"JobSpy — nouvelles offres ({datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M UTC')})"
     )
     if not records:
-        payload = {
-            "embeds": [
-                {
-                    "title": run_title,
-                    "description": "Aucune nouvelle offre depuis le dernier run.",
-                    "color": 9807270,
-                }
-            ]
-        }
+        payloads: list[dict[str, object]] = [
+            {
+                "embeds": [
+                    {
+                        "title": run_title,
+                        "description": "Aucune nouvelle offre depuis le dernier run.",
+                        "color": 9807270,
+                    }
+                ]
+            }
+        ]
     else:
-        payload = build_body(records, run_title, max_jobs, max_chars)
+        payloads = build_payloads(records, run_title, max_jobs, max_chars)
 
     if payload_out is not None:
         payload_out.parent.mkdir(parents=True, exist_ok=True)
+        # Écrit le 1er payload dans payload_out et aussi une liste paginée dans payload_out.jsonl
         payload_out.write_text(
-            json.dumps(payload, ensure_ascii=False, separators=(",", ":")),
+            json.dumps(payloads[0], ensure_ascii=False, separators=(",", ":")),
             encoding="utf-8",
         )
+        batches_path = payload_out.with_suffix(".jsonl")
+        with batches_path.open("w", encoding="utf-8") as bf:
+            for p in payloads:
+                bf.write(json.dumps(p, ensure_ascii=False, separators=(",", ":")) + "\n")
         print(
-            f"github_discord_job_alert: payload écrit dans {payload_out} ({len(records)} annonce(s))",
+            f"github_discord_job_alert: {len(payloads)} requête(s) préparée(s) dans {batches_path} "
+            f"({min(len(records), max_jobs)}/{len(records)} annonce(s) affichée(s))",
             file=sys.stderr,
         )
         return 0
 
-    try:
-        post_webhook(webhook, payload)
-    except urllib.error.HTTPError as e:
-        body = ""
+    for p in payloads:
         try:
-            body = e.read().decode("utf-8", errors="replace")[:2000]
-        except OSError:
-            pass
-        print(
-            f"Discord HTTP {e.code} {e.reason} — vérifie DISCORD_WEBHOOK_URL (webhook salon → Intégrations).",
-            file=sys.stderr,
-        )
-        if body:
-            print(f"Réponse Discord: {body}", file=sys.stderr)
-        if e.code == 403:
+            post_webhook(webhook, p)
+        except urllib.error.HTTPError as e:
+            body = ""
+            try:
+                body = e.read().decode("utf-8", errors="replace")[:2000]
+            except OSError:
+                pass
             print(
-                "Tentative de secours avec curl (parfois nécessaire sur GitHub Actions)…",
+                f"Discord HTTP {e.code} {e.reason} — vérifie DISCORD_WEBHOOK_URL (webhook salon → Intégrations).",
                 file=sys.stderr,
             )
-            try:
-                post_webhook_curl(webhook, payload)
-            except (RuntimeError, OSError, subprocess.TimeoutExpired) as retry:
-                print(f"Secours curl: {retry}", file=sys.stderr)
+            if body:
+                print(f"Réponse Discord: {body}", file=sys.stderr)
+            if e.code == 403:
                 print(
-                    "Si les deux échouent : régénère l’URL du webhook dans Discord et mets à jour le secret.",
+                    "Tentative de secours avec curl (parfois nécessaire sur GitHub Actions)…",
                     file=sys.stderr,
                 )
+                try:
+                    post_webhook_curl(webhook, p)
+                except (RuntimeError, OSError, subprocess.TimeoutExpired) as retry:
+                    print(f"Secours curl: {retry}", file=sys.stderr)
+                    return 1
+            else:
                 return 1
-        else:
+        except (urllib.error.URLError, OSError) as e:
+            print(f"Discord: {e}", file=sys.stderr)
             return 1
-    except urllib.error.URLError as e:
-        print(f"Discord URLError: {e}", file=sys.stderr)
-        return 1
-    except OSError as e:
-        print(f"Discord: {e}", file=sys.stderr)
-        return 1
 
     print(
-        f"github_discord_job_alert: envoyé ({len(records)} annonce(s))",
+        f"github_discord_job_alert: envoyé ({min(len(records), max_jobs)}/{len(records)} annonce(s) en {len(payloads)} message(s))",
         file=sys.stderr,
     )
     return 0

@@ -30,15 +30,16 @@ Keys read by the workflow (after you push the version of the workflow that suppo
 
 ```
 SEARCH_TERM=développeur web
-SITE=indeed,linkedin,zip_recruiter,glassdoor
+SITE=indeed,linkedin,hellowork,glassdoor
 LOCATION=Nantes
 COUNTRY_INDEED=france
+JOB_TYPE=cdi,cdd
 HOURS_OLD=72
 RESULTS=50
 REMOTE_FLAG=
 SKIP_DISCORD_IF_EMPTY=1
 MAX_JOBS=50
-MAX_EMBED_CHARS=4000
+MAX_EMBED_CHARS=3900
 DISCORD_EMBED_TITLE=Offres web — Nantes
 ```
 
@@ -54,12 +55,13 @@ Leave a key empty (e.g. `REMOTE_FLAG=`) to mean “not set”. If `JOBSPY_DOTENV
 | `JOBSPY_SITE` | `indeed,linkedin,zip_recruiter,glassdoor` | Comma-separated boards |
 | `JOBSPY_LOCATION` | *(empty)* | e.g. `Chicago` — omit for broader search |
 | `JOBSPY_COUNTRY_INDEED` | `usa` | Indeed / Glassdoor country |
+| `JOBSPY_JOB_TYPE` | *(empty)* | Job type filter: `fulltime`, `temporary`, `contract`, `parttime`, `internship` (aliases `cdi`, `cdd` and comma-separated lists like `cdi,cdd` or `fulltime,temporary` are supported) |
 | `JOBSPY_HOURS_OLD` | `72` | Only jobs posted in the last N hours |
 | `JOBSPY_RESULTS` | `50` | `-n` per board (upto ~50 per site per README; daily run default is 50) |
 | `JOBSPY_REMOTE_FLAG` | *(empty)* | Set to `1` or `true` to add `--remote` |
 | `JOBSPY_SKIP_DISCORD_IF_EMPTY` | *(empty)* | Set to `1` to skip Discord when there are no new jobs |
-| `JOBSPY_DISCORD_MAX_JOBS` | `50` | Max jobs listed in the Discord embed |
-| `JOBSPY_DISCORD_MAX_EMBED_CHARS` | `4000` | Max length for the embed description (Discord hard limit is 4096; text may still be truncated if many long URLs) |
+| `JOBSPY_DISCORD_MAX_JOBS` | `50` | Max jobs listed across Discord embeds (automatically split into multiple embeds/messages so listings are never cut off mid-list) |
+| `JOBSPY_DISCORD_MAX_EMBED_CHARS` | `3900` | Max length per embed description before starting a new embed (Discord hard limit is 4096) |
 | `JOBSPY_DISCORD_TITLE` | auto timestamp | Custom embed title |
 
 The workflow sets defaults `MAX_JOBS=50` and `MAX_EMBED_CHARS=4000` when those variables are unset. `SKIP_DISCORD_IF_EMPTY` is still read only by the script.

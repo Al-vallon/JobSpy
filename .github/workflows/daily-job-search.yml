@@ -2,7 +2,8 @@ name: Daily JobSpy search
 
 on:
   schedule:
-    - cron: "0 10 * * *"
+    # 09:00 UTC = 10:00 heure de Paris (CET, hiver)
+    - cron: "0 9 * * *"
   workflow_dispatch:
 
 concurrency:
@@ -63,6 +64,7 @@ jobs:
           FALLBACK_HOURS_OLD: ${{ vars.JOBSPY_HOURS_OLD }}
           FALLBACK_RESULTS: ${{ vars.JOBSPY_RESULTS }}
           FALLBACK_REMOTE_FLAG: ${{ vars.JOBSPY_REMOTE_FLAG }}
+          FALLBACK_JOB_TYPE: ${{ vars.JOBSPY_JOB_TYPE }}
         run: |
           set -euo pipefail
           if [ -f "$GITHUB_WORKSPACE/.jobspy.env" ]; then
@@ -78,21 +80,72 @@ jobs:
           HOURS="${HOURS_OLD:-${FALLBACK_HOURS_OLD:-72}}"
           N="${RESULTS:-${FALLBACK_RESULTS:-50}}"
           REMOTE_FLAG="${REMOTE_FLAG:-${FALLBACK_REMOTE_FLAG:-}}"
+          JTYPE="${JOB_TYPE:-${FALLBACK_JOB_TYPE:-}}"
           mkdir -p data
-          ARGS=( "$TERM" --site "$SITES" -n "$N" --hours-old "$HOURS" --country-indeed "$COUNTRY" )
-          if [ -n "$LOC" ]; then ARGS+=( --location "$LOC" ); fi
-          if [ "${REMOTE_FLAG:-}" = "1" ] || [ "${REMOTE_FLAG:-}" = "true" ]; then ARGS+=( --remote ); fi
-          ARGS+=( --fields id,site,title,company,location,date_posted,job_url,job_type,is_remote -q -o "$JOBSPY_ALL_JSONL" )
-          set +e
-          jobspy "${ARGS[@]}" > /dev/null
-          code=$?
-          set -e
-          echo "jobspy exit code: $code"
-          exit "$code"
+          rm -f "$JOBSPY_ALL_JSONL"
+          BASE_ARGS=( "$TERM" --site "$SITES" -n "$N" --hours-old "$HOURS" --country-indeed "$COUNTRY" )
+          if [ -n "$LOC" ]; then BASE_ARGS+=( --location "$LOC" ); fi
+          if [ "${REMOTE_FLAG:-}" = "1" ] || [ "${REMOTE_FLAG:-}" = "true" ]; then BASE_ARGS+=( --remote ); fi
+          FIELDS_ARG="--fields id,site,title,company,location,date_posted,job_url,job_type,is_remote"
+
+          map_job_type() {
+            case "${1,,}" in
+              cdi|permanent|full_time|full-time|fulltime) echo "fulltime" ;;
+              cdd|interim|intérim|temporary) echo "temporary" ;;
+              contract|freelance|independant|indépendant) echo "contract" ;;
+              part_time|part-time|parttime) echo "parttime" ;;
+              stage|alternance|internship) echo "internship" ;;
+              *) echo "${1,,}" ;;
+            esac
+          }
+
+          if [ -z "$JTYPE" ]; then
+            set +e
+            jobspy "${BASE_ARGS[@]}" $FIELDS_ARG -q -o "$JOBSPY_ALL_JSONL" > /dev/null
+            code=$?
+            set -e
+            echo "jobspy exit code: $code"
+            exit "$code"
+          else
+            IFS=',' read -ra TYPES <<< "$JTYPE"
+            any_ok=0
+            last_code=0
+            > "$JOBSPY_ALL_JSONL"
+            for raw_t in "${TYPES[@]}"; do
+              t_trimmed="$(echo "$raw_t" | xargs)"
+              [ -z "$t_trimmed" ] && continue
+              mapped="$(map_job_type "$t_trimmed")"
+              tmp_file="data/scrape_${mapped}.jsonl"
+              rm -f "$tmp_file"
+              echo "Running jobspy with --job-type $mapped ..."
+              set +e
+              jobspy "${BASE_ARGS[@]}" --job-type "$mapped" $FIELDS_ARG -q -o "$tmp_file" > /dev/null
+              c=$?
+              set -e
+              if [ "$c" -eq 0 ]; then
+                any_ok=1
+                [ -f "$tmp_file" ] && cat "$tmp_file" >> "$JOBSPY_ALL_JSONL"
+              else
+                last_code=$c
+              fi
+            done
+            if [ "$any_ok" -eq 0 ] && [ "$last_code" -ne 0 ]; then
+              exit "$last_code"
+            fi
+          fi
 
       - name: Merge into SQLite (new jobs only)
+        env:
+          FALLBACK_JOB_TYPE: ${{ vars.JOBSPY_JOB_TYPE }}
         run: |
-          python scripts/github_jobspy_sqlite.py "$JOBSPY_ALL_JSONL" "$JOBSPY_NEW_JSONL" --db "$JOBSPY_SQLITE_PATH"
+          if [ -f "$GITHUB_WORKSPACE/.jobspy.env" ]; then
+            set -a
+            # shellcheck disable=SC1091
+            . "$GITHUB_WORKSPACE/.jobspy.env"
+            set +a
+          fi
+          export JOB_TYPE="${JOB_TYPE:-${FALLBACK_JOB_TYPE:-}}"
+          python scripts/github_jobspy_sqlite.py "$JOBSPY_ALL_JSONL" "$JOBSPY_NEW_JSONL" --db "$JOBSPY_SQLITE_PATH" --job-types "$JOB_TYPE"
 
       - name: Build Discord payload
         env:
@@ -138,16 +191,37 @@ jobs:
             echo "::error::Missing $JOBSPY_DISCORD_PAYLOAD — build step failed?"
             exit 1
           fi
-          echo "Posting Discord payload via curl (no secret in log)…"
-          HTTP_CODE="$(curl -sS -o /tmp/discord_resp.txt -w '%{http_code}' -X POST "$URL" \
-            -H 'Content-Type: application/json' \
-            -H 'User-Agent: JobSpy-GitHub-Action/1.0' \
-            --data-binary @"$JOBSPY_DISCORD_PAYLOAD")"
-          echo "Discord HTTP status: $HTTP_CODE"
-          if [ "$HTTP_CODE" != "204" ] && [ "$HTTP_CODE" != "200" ]; then
-            echo "::error::Discord rejected the request. Body:"
-            head -c 2000 /tmp/discord_resp.txt || true
-            exit 1
+          echo "Posting Discord payload(s) via curl (no secret in log)…"
+          BATCHES_FILE="${JOBSPY_DISCORD_PAYLOAD%.json}.jsonl"
+          if [ -f "$BATCHES_FILE" ]; then
+            idx=0
+            while IFS= read -r line || [ -n "$line" ]; do
+              [ -z "$line" ] && continue
+              idx=$((idx + 1))
+              printf '%s' "$line" > /tmp/discord_batch.json
+              HTTP_CODE="$(curl -sS -o /tmp/discord_resp.txt -w '%{http_code}' -X POST "$URL" \
+                -H 'Content-Type: application/json' \
+                -H 'User-Agent: JobSpy-GitHub-Action/1.0' \
+                --data-binary @/tmp/discord_batch.json)"
+              echo "Discord batch #$idx HTTP status: $HTTP_CODE"
+              if [ "$HTTP_CODE" != "204" ] && [ "$HTTP_CODE" != "200" ]; then
+                echo "::error::Discord rejected batch #$idx. Body:"
+                head -c 2000 /tmp/discord_resp.txt || true
+                exit 1
+              fi
+              sleep 1
+            done < "$BATCHES_FILE"
+          else
+            HTTP_CODE="$(curl -sS -o /tmp/discord_resp.txt -w '%{http_code}' -X POST "$URL" \
+              -H 'Content-Type: application/json' \
+              -H 'User-Agent: JobSpy-GitHub-Action/1.0' \
+              --data-binary @"$JOBSPY_DISCORD_PAYLOAD")"
+            echo "Discord HTTP status: $HTTP_CODE"
+            if [ "$HTTP_CODE" != "204" ] && [ "$HTTP_CODE" != "200" ]; then
+              echo "::error::Discord rejected the request. Body:"
+              head -c 2000 /tmp/discord_resp.txt || true
+              exit 1
+            fi
           fi
           echo "Discord OK."
 
