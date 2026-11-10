@@ -81,6 +81,37 @@ This repository includes a scheduled workflow (10:00 UTC daily) that runs the `j
 - Workflow: [`.github/workflows/daily-job-search.yml`](.github/workflows/daily-job-search.yml)
 - Setup (secret, variables, optional single multiline `JOBSPY_DOTENV`, behaviour): [`docs/github-actions-daily.md`](docs/github-actions-daily.md)
 
+## Discord automation (GitHub Actions)
+
+A scheduled GitHub Actions workflow (`.github/workflows/daily-job-search.yml`) runs JobSpy every day, keeps only the **new** offers, and posts them to a Discord channel through a webhook.
+
+### How it works
+
+1. The workflow runs `jobspy` for each search term (and for each job type, if `JOB_TYPE` is set).
+2. All results are concatenated into a single JSONL file.
+3. New offers are merged into a SQLite database (already-seen jobs are skipped).
+4. The new offers are sent to Discord as an embed.
+
+### Multiple search terms
+
+`SEARCH_TERM` accepts several queries separated by `,` or `;`. Each query triggers its own `jobspy` run, and the results are merged:
+
+
+| Key | Description |
+|-----|-------------|
+| `SEARCH_TERM` | One query, or a comma/semicolon-separated list of queries |
+| `SITE` | Comma-separated job boards |
+| `LOCATION` | City to search in (leave empty for a broader search) |
+| `COUNTRY_INDEED` | Country used by Indeed / Glassdoor |
+| `REMOTE_FLAG` | `1` or `true` to restrict to remote jobs |
+| `SKIP_DISCORD_IF_EMPTY` | `1` = don't post anything when there are no new offers |
+| `MAX_JOBS` | Maximum number of offers in one message |
+| `MAX_EMBED_CHARS` | Max characters in the embed (Discord limits embed descriptions to 4096) |
+| `DISCORD_EMBED_TITLE` | Title of the Discord embed |
+
+Leave a key empty to mean "not set". If `JOBSPY_DOTENV` is non-empty, it overrides the individual `JOBSPY_*` variables (which act as a fallback for missing keys).
+
+
 ## MCP server
 
 [`mcp-jobspy`](https://pypi.org/project/mcp-jobspy/) is an MCP server that runs with `uvx mcp-jobspy@latest`. See [mcp/README.md](https://github.com/speedyapply/JobSpy/blob/main/mcp/README.md) for setup, tools and proxies.
@@ -97,6 +128,15 @@ This repository includes a scheduled workflow (10:00 UTC daily) that runs the `j
   }
 }
 ```
+### Setup
+
+1. In Discord: *Channel settings → Integrations → Webhooks → New webhook*, then copy the URL.
+2. In GitHub: *Settings → Secrets and variables → Actions*
+   - add the webhook URL as a **secret** named `<DISCORD_WEBHOOK_SECRET_NAME>`;
+   - add the `JOBSPY_DOTENV` **variable** shown above.
+3. Run it manually from the *Actions* tab (*Run workflow*) to test, or wait for the schedule (`<cron, e.g. every day at 07:00 UTC>`).
+
+For the full list of variables, see [docs/github-actions-daily.md](docs/github-actions-daily.md).
 
 ## Parameters for `scrape_jobs()`
 
